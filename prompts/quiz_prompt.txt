@@ -1,0 +1,3 @@
+Create a short quiz from the provided PDF content.
+
+TODO: Replace this prompt with the final quiz prompt.

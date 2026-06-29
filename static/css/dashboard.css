@@ -1,0 +1,78 @@
+.dashboard-body {
+    min-height: 100vh;
+}
+
+.app-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.dashboard-main {
+    padding: 1.5rem;
+}
+
+.dashboard-header {
+    align-items: start;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1;
+    margin: 0 0 0.75rem;
+}
+
+.dashboard-header p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.status-card {
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 0.6rem;
+    padding: 0.8rem 1rem;
+}
+
+.status-dot {
+    background: #f59e0b;
+    border-radius: 999px;
+    height: 10px;
+    width: 10px;
+}
+
+.dashboard-grid {
+    align-items: start;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+}
+
+.panel-heading {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.panel-heading h2 {
+    margin: 0;
+}

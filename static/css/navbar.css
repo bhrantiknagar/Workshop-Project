@@ -1,0 +1,66 @@
+.navbar {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    height: 72px;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.brand {
+    align-items: center;
+    display: inline-flex;
+    font-weight: 900;
+    gap: 0.7rem;
+}
+
+.brand-mark {
+    align-items: center;
+    background: var(--primary);
+    border-radius: 8px;
+    color: #ffffff;
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-links a {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+}
+
+.icon-button {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.5rem;
+}
+
+.menu-toggle span {
+    background: var(--text);
+    border-radius: 999px;
+    display: block;
+    height: 2px;
+    width: 22px;
+}

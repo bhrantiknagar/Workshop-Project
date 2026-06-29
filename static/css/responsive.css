@@ -1,0 +1,46 @@
+@media (max-width: 900px) {
+    .menu-toggle {
+        display: inline-flex;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .hero,
+    .dashboard-grid,
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+        min-height: auto;
+        position: static;
+    }
+
+    .sidebar.is-open {
+        display: block;
+    }
+
+    .dashboard-header {
+        display: grid;
+    }
+}
+
+@media (max-width: 560px) {
+    .home-shell,
+    .content-page,
+    .dashboard-main {
+        padding: 1rem;
+    }
+
+    .chat-form {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,3 @@
+Explain the selected PDF passage in simple terms.
+
+TODO: Replace this prompt with the final explanation prompt.

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | SmartPDF AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+    {% include "components/navbar.html" %}
+    <main class="content-page">
+        <section>
+            <p class="eyebrow">About</p>
+            <h1>Built for readable AI document workflows.</h1>
+            <p>SmartPDF AI is structured so Flask handles the web layer, routes stay thin, and document intelligence lives inside dedicated services.</p>
+        </section>
+    </main>
+    {% include "components/footer.html" %}
+</body>
+</html>

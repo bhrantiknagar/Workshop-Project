@@ -1,0 +1,3 @@
+Summarize the provided PDF content into concise, useful notes.
+
+TODO: Replace this prompt with the final summary prompt.

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | SmartPDF AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main class="error-page">
+        <div>
+            <p class="eyebrow">Error {{ code }}</p>
+            <h1>Something needs attention.</h1>
+            <p>{{ error }}</p>
+            <a class="button primary" href="{{ url_for('home.index') }}">Return Home</a>
+        </div>
+    </main>
+</body>
+</html>

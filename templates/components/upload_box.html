@@ -1,0 +1,19 @@
+<section class="panel upload-panel" id="upload-panel">
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">Document</p>
+            <h2>Upload PDF</h2>
+        </div>
+        <span class="badge">PDF only</span>
+    </div>
+    <form class="upload-box" id="uploadForm" enctype="multipart/form-data">
+        <input id="pdfFile" name="pdf" type="file" accept="application/pdf">
+        <label for="pdfFile">
+            <span class="upload-icon">+</span>
+            <strong>Choose a PDF</strong>
+            <small>Maximum size: 25 MB</small>
+        </label>
+        <button class="button primary" type="submit">Upload Document</button>
+    </form>
+    <p class="form-status" id="uploadStatus" aria-live="polite"></p>
+</section>

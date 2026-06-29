@@ -1,0 +1,16 @@
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('home.index') }}">
+        <span class="brand-mark">S</span>
+        <span>SmartPDF AI</span>
+    </a>
+    <button class="icon-button menu-toggle" type="button" aria-label="Toggle navigation" data-sidebar-toggle>
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="nav-links">
+        <a href="{{ url_for('home.index') }}">Home</a>
+        <a href="{{ url_for('home.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('home.about') }}">About</a>
+    </div>
+</nav>

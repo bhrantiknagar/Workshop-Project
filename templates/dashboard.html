@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SmartPDF AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body class="dashboard-body">
+    {% include "components/navbar.html" %}
+    <div class="app-layout">
+        {% include "components/sidebar.html" %}
+        <main class="dashboard-main">
+            <section class="dashboard-header">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h1>PDF Question Answering</h1>
+                    <p>Prepare documents, ask focused questions, and review generated summaries from one dashboard.</p>
+                </div>
+                <div class="status-card">
+                    <span class="status-dot"></span>
+                    <span>AI services pending integration</span>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+                {% include "components/upload_box.html" %}
+                {% include "components/chat_box.html" %}
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/summary.js') }}"></script>
+</body>
+</html>

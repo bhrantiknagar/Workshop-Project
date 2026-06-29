@@ -1,0 +1,5 @@
+"""Shared constants for SmartPDF AI."""
+
+APP_NAME = "SmartPDF AI"
+DEFAULT_CHUNK_SIZE = 1000
+DEFAULT_CHUNK_OVERLAP = 150

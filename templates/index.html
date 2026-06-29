@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPDF AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+    {% include "components/navbar.html" %}
+    <main class="home-shell">
+        <section class="hero">
+            <div class="hero-content">
+                <p class="eyebrow">AI PDF workspace</p>
+                <h1>SmartPDF AI</h1>
+                <p>Upload PDFs, prepare documents for retrieval, and ask questions from a polished Flask dashboard.</p>
+                <div class="hero-actions">
+                    <a class="button primary" href="{{ url_for('home.dashboard') }}">Open Dashboard</a>
+                    <a class="button secondary" href="{{ url_for('home.about') }}">About Project</a>
+                </div>
+            </div>
+            <div class="hero-panel">
+                <span class="panel-tag">Pipeline</span>
+                <ul>
+                    <li>PDF ingestion</li>
+                    <li>Chunk preparation</li>
+                    <li>Vector retrieval</li>
+                    <li>Ollama answers</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    {% include "components/footer.html" %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

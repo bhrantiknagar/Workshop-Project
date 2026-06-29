@@ -1,0 +1,50 @@
+.upload-box {
+    display: grid;
+    gap: 1rem;
+}
+
+.upload-box input[type="file"] {
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.upload-box label {
+    align-items: center;
+    background: #f8fafc;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: grid;
+    min-height: 220px;
+    padding: 1.5rem;
+    place-items: center;
+    text-align: center;
+}
+
+.upload-box label:hover {
+    border-color: var(--primary);
+}
+
+.upload-icon {
+    align-items: center;
+    background: var(--surface-muted);
+    border-radius: 8px;
+    color: var(--primary);
+    display: inline-flex;
+    font-size: 2rem;
+    font-weight: 900;
+    height: 56px;
+    justify-content: center;
+    width: 56px;
+}
+
+.upload-box small,
+.form-status {
+    color: var(--muted);
+}
+
+.form-status {
+    min-height: 1.5rem;
+}
