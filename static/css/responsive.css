@@ -169,3 +169,82 @@
         display: flex;
     }
 }
+
+/* Responsive rules for the product workspace. */
+@media (max-width: 1040px) {
+    .home-hero,
+    .workspace-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-product-card {
+        max-width: 560px;
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .navbar,
+    .dashboard-navbar {
+        align-items: flex-start;
+        flex-direction: column;
+        height: auto;
+    }
+
+    .dashboard-main {
+        padding: 16px;
+    }
+
+    .home-hero,
+    .section {
+        padding: 32px 16px;
+    }
+
+    .feature-grid,
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .step-arrow {
+        justify-self: start;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 540px) {
+    .nav-links {
+        width: 100%;
+    }
+
+    .nav-links a:not(.nav-cta) {
+        display: inline-flex;
+    }
+
+    .hero-content h1 {
+        font-size: 42px;
+    }
+
+    .hero-content h2 {
+        font-size: 20px;
+    }
+
+    .panel,
+    .empty-state-card,
+    .dashboard-navbar {
+        padding: 16px;
+    }
+
+    .user-profile div {
+        display: none;
+    }
+
+    .message-content {
+        max-width: 88%;
+    }
+}

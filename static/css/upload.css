@@ -152,3 +152,87 @@
 .status-ready {
     color: var(--success);
 }
+
+/* Compact upload card. */
+.drop-zone {
+    background: var(--bg-soft);
+    border-color: var(--border);
+    border-radius: 12px;
+    min-height: 188px;
+}
+
+.drop-zone:hover,
+.drop-zone.is-dragging {
+    background: #243044;
+    border-color: var(--primary);
+    transform: none;
+}
+
+.upload-icon {
+    background: var(--surface);
+    border-radius: 8px;
+    color: var(--primary);
+    height: 52px;
+    width: 52px;
+}
+
+.browse-button {
+    margin-top: 8px;
+}
+
+.progress-track {
+    border-radius: 999px;
+    height: 8px;
+}
+
+.progress-bar {
+    background: var(--primary);
+}
+
+.uploaded-file-card {
+    align-items: center;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.uploaded-file-card[hidden] {
+    display: none;
+}
+
+.uploaded-file-card > div {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+}
+
+.uploaded-file-card i {
+    color: var(--danger);
+}
+
+.uploaded-file-card strong,
+.uploaded-file-card small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.uploaded-file-card small {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.delete-file-button {
+    color: var(--danger);
+    flex: 0 0 auto;
+}
+
+.pdf-info-card {
+    background: var(--bg-soft);
+    border-radius: 12px;
+}

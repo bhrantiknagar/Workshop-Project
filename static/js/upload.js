@@ -8,7 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const infoFilename = document.querySelector("#infoFilename");
     const infoPages = document.querySelector("#infoPages");
     const infoSize = document.querySelector("#infoSize");
+    const infoDate = document.querySelector("#infoDate");
     const infoStatus = document.querySelector("#infoStatus");
+    const emptyState = document.querySelector("#emptyState");
+    const uploadedFileCard = document.querySelector("#uploadedFileCard");
+    const uploadedFilename = document.querySelector("#uploadedFilename");
+    const uploadedMeta = document.querySelector("#uploadedMeta");
+    const deleteUploadedFile = document.querySelector("#deleteUploadedFile");
 
     if (!fileInput || !dropZone || !progress) {
         return;
@@ -45,8 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 infoFilename.textContent = file.name;
                 infoPages.textContent = String(Math.max(6, Math.round(file.size / 85000)));
                 infoSize.textContent = formatSize(file.size);
+                infoDate.textContent = new Date().toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                });
                 infoStatus.textContent = "Ready";
                 infoStatus.classList.add("status-ready");
+                uploadedFilename.textContent = file.name;
+                uploadedMeta.textContent = `${formatSize(file.size)} · PDF`;
+                uploadedFileCard.hidden = false;
+                emptyState?.classList.add("is-hidden");
 
                 if (currentPdfName) {
                     currentPdfName.textContent = file.name;
@@ -82,5 +97,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (file) {
             simulateUpload(file);
         }
+    });
+
+    deleteUploadedFile?.addEventListener("click", () => {
+        fileInput.value = "";
+        progress.style.width = "0%";
+        progressLabel.textContent = "Waiting for PDF";
+        infoFilename.textContent = "Not uploaded";
+        infoPages.textContent = "--";
+        infoSize.textContent = "--";
+        infoDate.textContent = "--";
+        infoStatus.textContent = "Idle";
+        uploadedFileCard.hidden = true;
+        emptyState?.classList.remove("is-hidden");
+
+        if (currentPdfName) {
+            currentPdfName.textContent = "No PDF selected";
+        }
+
+        window.showToast("Uploaded file removed.");
     });
 });

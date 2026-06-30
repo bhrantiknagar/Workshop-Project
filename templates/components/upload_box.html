@@ -12,7 +12,7 @@
         <label class="drop-zone" for="pdfFile" id="dropZone">
             <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
             <strong>Drag and drop your PDF here</strong>
-            <small>or browse from your device</small>
+            <small>Supported: PDF only</small>
             <span class="button secondary browse-button">Browse File</span>
         </label>
         <div class="progress-wrap" aria-label="Upload progress">
@@ -22,6 +22,19 @@
             </div>
         </div>
     </form>
+
+    <article class="uploaded-file-card" id="uploadedFileCard" hidden>
+        <div>
+            <i class="fa-regular fa-file-pdf"></i>
+            <div>
+                <strong id="uploadedFilename">Document.pdf</strong>
+                <small id="uploadedMeta">Ready</small>
+            </div>
+        </div>
+        <button class="icon-button delete-file-button" type="button" id="deleteUploadedFile" aria-label="Remove uploaded file">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </article>
 
     <article class="pdf-info-card" id="pdfInfo">
         <div class="info-row">
@@ -35,6 +48,10 @@
         <div class="info-row">
             <span>File Size</span>
             <strong id="infoSize">--</strong>
+        </div>
+        <div class="info-row">
+            <span>Upload Date</span>
+            <strong id="infoDate">--</strong>
         </div>
         <div class="info-row">
             <span>Status</span>

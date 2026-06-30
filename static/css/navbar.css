@@ -107,3 +107,29 @@
     min-height: 42px;
     padding: 0.7rem 1rem;
 }
+
+/* Quiet product navigation. */
+.navbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: none;
+    height: 72px;
+    padding: 0 clamp(24px, 5vw, 72px);
+}
+
+.brand-mark {
+    background: var(--primary);
+    border-radius: 8px;
+    box-shadow: none;
+    height: 36px;
+    width: 36px;
+}
+
+.nav-links {
+    gap: 24px;
+}
+
+.nav-cta {
+    border-radius: 8px;
+    min-height: 38px;
+}

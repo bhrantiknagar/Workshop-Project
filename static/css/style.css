@@ -145,7 +145,7 @@ input {
     text-align: center;
 }
 
-/* SmartPDF AI premium frontend theme. */
+/* SmartPDF AI product frontend theme. */
 :root {
     --bg: #070b16;
     --bg-soft: #0c1222;
@@ -190,7 +190,7 @@ body {
         radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.16), transparent 30rem),
         var(--bg);
     color: var(--text);
-    font-family: "Poppins", system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     min-height: 100vh;
 }
 
@@ -503,4 +503,259 @@ select {
 
 .footer p {
     margin: 0.25rem 0 0;
+}
+
+/* Product UI refinement: quiet SaaS styling. */
+:root {
+    --bg: #111827;
+    --bg-soft: #1f2937;
+    --surface: #252f3f;
+    --surface-strong: #1f2937;
+    --surface-muted: #1f2937;
+    --text: #ffffff;
+    --muted: #9ca3af;
+    --subtle: #9ca3af;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-soft: rgba(37, 99, 235, 0.16);
+    --accent: #2563eb;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border: #374151;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    --radius: 12px;
+}
+
+body.light-theme {
+    --bg: #f3f4f6;
+    --bg-soft: #ffffff;
+    --surface: #ffffff;
+    --surface-strong: #ffffff;
+    --surface-muted: #f9fafb;
+    --text: #111827;
+    --muted: #4b5563;
+    --subtle: #6b7280;
+    --border: #d1d5db;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.glass-card,
+.panel,
+.feature-card,
+.step-card,
+.modal {
+    backdrop-filter: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.button {
+    border-radius: 8px;
+    min-height: 40px;
+    padding: 0.65rem 0.9rem;
+}
+
+.button.primary {
+    background: var(--primary);
+    box-shadow: none;
+}
+
+.button.primary:hover,
+.nav-cta:hover {
+    background: var(--primary-dark);
+}
+
+.button.secondary {
+    background: var(--bg-soft);
+}
+
+.eyebrow {
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-transform: none;
+}
+
+.home-hero {
+    gap: 48px;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    min-height: auto;
+    padding: 72px clamp(24px, 5vw, 72px) 48px;
+}
+
+.hero-content h1 {
+    font-size: clamp(42px, 5vw, 48px);
+    line-height: 1.08;
+    margin-bottom: 8px;
+}
+
+.hero-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0 0 16px;
+}
+
+.hero-content p {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.hero-actions {
+    margin-top: 24px;
+}
+
+.hero-product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+}
+
+.laptop-illustration {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.laptop-topbar {
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+}
+
+.laptop-topbar span {
+    background: #4b5563;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+}
+
+.laptop-content {
+    display: grid;
+    gap: 12px;
+    padding: 24px;
+}
+
+.pdf-tile,
+.chat-preview-line {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.pdf-tile {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+.pdf-tile i {
+    color: var(--danger);
+}
+
+.chat-preview-line {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.user-line {
+    justify-self: end;
+    max-width: 78%;
+}
+
+.ai-line {
+    max-width: 86%;
+}
+
+.section {
+    padding: 48px clamp(24px, 5vw, 72px);
+}
+
+.section-heading {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.section-heading h2 {
+    font-size: clamp(26px, 4vw, 30px);
+    line-height: 1.25;
+}
+
+.feature-grid {
+    gap: 16px;
+}
+
+.feature-card,
+.step-card {
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.feature-card:hover,
+.step-card:hover {
+    border-color: #4b5563;
+    transform: translateY(-2px);
+}
+
+.feature-card > i,
+.step-card > i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.feature-card h3,
+.step-card h3 {
+    font-size: 20px;
+}
+
+.feature-card p {
+    font-size: 14px;
+}
+
+.steps {
+    gap: 16px;
+}
+
+.step-card {
+    min-height: 132px;
+}
+
+.step-arrow {
+    color: var(--muted);
+}
+
+.footer {
+    background: var(--bg-soft);
+    padding: 24px clamp(24px, 5vw, 72px);
+}
+
+.footer-brand,
+.footer-links {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+}
+
+.footer-links {
+    color: var(--muted);
+    flex-wrap: wrap;
+    font-size: 14px;
+}
+
+.hero-glow {
+    display: none;
 }

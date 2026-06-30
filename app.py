@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template
 
+
 from config import Config
 from routes.api import api_bp
 from routes.chat import chat_bp

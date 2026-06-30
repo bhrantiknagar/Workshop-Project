@@ -48,8 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (themeToggle) {
         themeToggle.addEventListener("change", () => {
-            document.body.classList.toggle("light-theme", !themeToggle.checked);
-            window.showToast(themeToggle.checked ? "Dark theme enabled" : "Light preview enabled");
+            const mode = themeToggle.value;
+            document.body.classList.toggle("light-theme", mode === "light");
+            window.showToast(`${mode.charAt(0).toUpperCase() + mode.slice(1)} theme selected`);
         });
     }
 });

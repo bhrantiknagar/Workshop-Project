@@ -6,7 +6,7 @@
     <title>Dashboard | SmartPDF AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
@@ -17,19 +17,21 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
 <body class="dashboard-body" id="dashboard">
-    <div class="app-shell">
-        {% include "components/sidebar.html" %}
-
+    <div class="app-shell product-workspace">
         <main class="dashboard-main">
-            <header class="top-header">
-                <button class="icon-button mobile-sidebar-button" type="button" aria-label="Open sidebar" data-sidebar-toggle>
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+            <header class="top-header dashboard-navbar">
+                <a class="dashboard-brand" href="{{ url_for('home.index') }}">
+                    <span class="brand-mark"><i class="fa-solid fa-file-lines"></i></span>
+                    <strong>SmartPDF AI</strong>
+                </a>
                 <div>
                     <span class="eyebrow">Current PDF</span>
                     <h1 id="currentPdfName">No PDF selected</h1>
                 </div>
                 <div class="header-actions">
+                    <button class="icon-button" type="button" aria-label="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
                     <button class="icon-button" type="button" aria-label="Open settings" data-modal-open="settingsModal">
                         <i class="fa-solid fa-gear"></i>
                     </button>
@@ -43,24 +45,18 @@
                 </div>
             </header>
 
-            <section class="welcome-card glass-card">
+            <section class="empty-state-card" id="emptyState">
                 <div>
-                    <span class="eyebrow">Start here</span>
-                    <h2>Upload a PDF to start chatting.</h2>
-                    <p>Drag a file into the upload area, watch the interface prepare it, then ask questions in the chat panel.</p>
-                </div>
-                <div class="welcome-orb">
-                    <i class="fa-regular fa-file-pdf"></i>
+                    <span class="empty-icon"><i class="fa-regular fa-file-pdf"></i></span>
+                    <h2>No PDF Uploaded</h2>
+                    <p>Upload a PDF to start chatting.</p>
                 </div>
             </section>
 
-            <section class="dashboard-grid">
-                {% include "components/upload_box.html" %}
-                {% include "components/chat_box.html" %}
-            </section>
-
-            <section class="lower-grid">
-                <article class="panel summary-card" id="summary-panel">
+            <section class="workspace-grid">
+                <div class="left-column">
+                    {% include "components/upload_box.html" %}
+                    <article class="panel summary-card" id="summary-panel">
                     <div class="panel-heading">
                         <div>
                             <span class="eyebrow">Summary</span>
@@ -74,11 +70,14 @@
                     <ul class="summary-list" id="summaryList">
                         <li>Upload a PDF to generate executive-level bullet points.</li>
                         <li>Important topics, themes, and page references will appear here.</li>
-                        <li>This is a frontend placeholder with production-ready states.</li>
+                        <li>This is placeholder content until the backend is connected.</li>
                     </ul>
-                </article>
+                    </article>
+                </div>
 
-                <article class="panel history-card" id="history-panel">
+                <div class="right-column">
+                    {% include "components/chat_box.html" %}
+                    <article class="panel history-card" id="history-panel">
                     <div class="panel-heading">
                         <div>
                             <span class="eyebrow">History</span>
@@ -92,7 +91,8 @@
                             <small>Ask something about your PDF to build history.</small>
                         </div>
                     </div>
-                </article>
+                    </article>
+                </div>
             </section>
         </main>
     </div>
@@ -111,19 +111,20 @@
             <div class="setting-row">
                 <div>
                     <strong>Theme</strong>
-                    <small>Toggle between dark and dim light preview.</small>
+                    <small>Choose Light, Dark, or System.</small>
                 </div>
-                <label class="switch">
-                    <input type="checkbox" id="themeToggle" checked>
-                    <span></span>
-                </label>
+                <select id="themeToggle" aria-label="Theme">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                    <option value="system">System</option>
+                </select>
             </div>
             <label class="field">
-                <span>Model</span>
+                <span>Language</span>
                 <select id="modelSelect">
-                    <option>Ollama Llama 3.1</option>
-                    <option>Mistral Placeholder</option>
-                    <option>Gemma Placeholder</option>
+                    <option>English</option>
+                    <option>Hindi Placeholder</option>
+                    <option>Spanish Placeholder</option>
                 </select>
             </label>
             <button class="button danger" type="button" id="clearHistory">

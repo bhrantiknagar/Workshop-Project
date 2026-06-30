@@ -6,7 +6,7 @@
     <title>SmartPDF AI | Chat with Your PDFs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
@@ -17,14 +17,13 @@
 
     <main>
         <section class="hero home-hero" id="home">
-            <div class="hero-glow"></div>
             <div class="hero-content">
-                <span class="eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> AI PDF assistant</span>
-                <h1>Chat with Your PDFs Using AI</h1>
+                <span class="eyebrow"><i class="fa-solid fa-file-lines"></i> AI PDF assistant</span>
+                <h1>SmartPDF AI</h1>
+                <h2>Upload your PDF and ask questions using AI.</h2>
                 <p>
-                    SmartPDF AI turns long documents into a focused conversation. Upload a PDF,
-                    ask natural questions, get summaries, and keep page-aware answers in one
-                    elegant workspace.
+                    SmartPDF AI lets you upload documents, ask questions, generate summaries,
+                    and quickly find important information using artificial intelligence.
                 </p>
                 <div class="hero-actions">
                     <a class="button primary" href="{{ url_for('home.dashboard') }}#upload-panel">
@@ -36,31 +35,22 @@
                         Learn More
                     </a>
                 </div>
-                <div class="hero-trust">
-                    <span><i class="fa-solid fa-lock"></i> Private workspace</span>
-                    <span><i class="fa-solid fa-bolt"></i> Fast answers</span>
-                    <span><i class="fa-solid fa-book-open"></i> Page references</span>
-                </div>
             </div>
 
-            <div class="hero-product-card glass-card" aria-label="SmartPDF AI preview">
-                <div class="mini-window-bar">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <div class="document-preview">
-                    <div class="doc-icon"><i class="fa-regular fa-file-pdf"></i></div>
-                    <div>
-                        <strong>Research_Report.pdf</strong>
-                        <small>42 pages indexed</small>
+            <div class="hero-product-card" aria-label="SmartPDF AI workspace illustration">
+                <div class="laptop-illustration">
+                    <div class="laptop-topbar">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
-                </div>
-                <div class="preview-chat">
-                    <div class="preview-bubble user">Summarize the key findings.</div>
-                    <div class="preview-bubble ai">
-                        The document highlights three major trends with supporting references.
-                        <span>Page 8</span>
+                    <div class="laptop-content">
+                        <div class="pdf-tile">
+                            <i class="fa-regular fa-file-pdf"></i>
+                            <span>Report.pdf</span>
+                        </div>
+                        <div class="chat-preview-line user-line">What are the key findings?</div>
+                        <div class="chat-preview-line ai-line">The report identifies three main findings with page references.</div>
                     </div>
                 </div>
             </div>
@@ -69,23 +59,23 @@
         <section class="section" id="features">
             <div class="section-heading">
                 <span class="eyebrow">Features</span>
-                <h2>Everything a serious PDF assistant needs.</h2>
+                <h2>Designed for practical document work.</h2>
             </div>
             <div class="feature-grid">
                 <article class="feature-card">
                     <i class="fa-solid fa-comments"></i>
-                    <h3>AI Question Answering</h3>
+                    <h3>Chat with PDF</h3>
                     <p>Ask direct questions and receive document-grounded responses.</p>
                 </article>
                 <article class="feature-card">
                     <i class="fa-solid fa-align-left"></i>
-                    <h3>PDF Summarization</h3>
+                    <h3>AI Summary</h3>
                     <p>Condense dense reports into clean, readable bullet points.</p>
                 </article>
                 <article class="feature-card">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <h3>Multi PDF Support</h3>
-                    <p>Prepare collections for cross-document research. Coming soon.</p>
+                    <i class="fa-solid fa-bookmark"></i>
+                    <h3>Page References</h3>
+                    <p>Keep answers traceable with compact source indicators.</p>
                 </article>
                 <article class="feature-card">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -93,14 +83,14 @@
                     <p>Find relevant context quickly with a retrieval-ready interface.</p>
                 </article>
                 <article class="feature-card">
-                    <i class="fa-solid fa-bookmark"></i>
-                    <h3>Page References</h3>
-                    <p>Keep answers traceable with compact page reference badges.</p>
-                </article>
-                <article class="feature-card">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <h3>Chat History</h3>
-                    <p>Review recent prompts and continue where your research paused.</p>
+                    <p>Review recent prompts and continue document research.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>Secure Upload</h3>
+                    <p>Use a clean upload flow prepared for private documents.</p>
                 </article>
             </div>
         </section>
@@ -108,7 +98,7 @@
         <section class="section how-section">
             <div class="section-heading">
                 <span class="eyebrow">How it works</span>
-                <h2>From upload to answer in four simple steps.</h2>
+                <h2>How it works</h2>
             </div>
             <div class="steps">
                 <article class="step-card">
@@ -120,7 +110,7 @@
                 <article class="step-card">
                     <span>2</span>
                     <i class="fa-solid fa-brain"></i>
-                    <h3>AI Reads Document</h3>
+                    <h3>AI Processes Document</h3>
                 </article>
                 <i class="fa-solid fa-arrow-down step-arrow"></i>
                 <article class="step-card">
@@ -132,7 +122,7 @@
                 <article class="step-card">
                     <span>4</span>
                     <i class="fa-solid fa-circle-check"></i>
-                    <h3>Receive Accurate Answers</h3>
+                    <h3>Get Accurate Answers</h3>
                 </article>
             </div>
         </section>

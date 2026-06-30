@@ -237,3 +237,45 @@
         transform: translateY(-3px);
     }
 }
+
+/* Practical messaging app styling. */
+.chat-panel {
+    min-height: 640px;
+}
+
+.messages {
+    background: var(--bg-soft);
+    border-radius: 12px;
+    max-height: 520px;
+    min-height: 420px;
+}
+
+.avatar {
+    background: var(--primary);
+    border-radius: 8px;
+}
+
+.message-content p,
+.message p {
+    background: var(--surface);
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.user-message .message-content p {
+    background: var(--primary);
+}
+
+.copy-button,
+.page-badge,
+.delete-history {
+    border-radius: 8px;
+}
+
+.typing {
+    border-radius: 8px;
+}
+
+.chat-form input {
+    border-radius: 8px;
+}

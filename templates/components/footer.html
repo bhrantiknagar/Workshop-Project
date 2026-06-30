@@ -1,7 +1,15 @@
 <footer class="footer">
     <div>
-        <strong>SmartPDF AI</strong>
-        <p>Premium AI workspace for document research.</p>
+        <a class="footer-brand" href="{{ url_for('home.index') }}">
+            <span class="brand-mark"><i class="fa-solid fa-file-lines"></i></span>
+            <strong>SmartPDF AI</strong>
+        </a>
+        <p>Copyright 2026 SmartPDF AI.</p>
     </div>
-    <span>Built with HTML, CSS, and vanilla JavaScript.</span>
+    <nav class="footer-links" aria-label="Footer links">
+        <a href="{{ url_for('home.index') }}">Home</a>
+        <a href="{{ url_for('home.about') }}">About</a>
+        <a href="{{ url_for('home.dashboard') }}">Get Started</a>
+        <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
 </footer>
