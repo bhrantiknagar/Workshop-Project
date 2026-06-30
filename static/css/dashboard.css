@@ -76,3 +76,279 @@
 .panel-heading h2 {
     margin: 0;
 }
+
+/* Main dashboard workspace. */
+.dashboard-body {
+    background: var(--bg);
+}
+
+.app-shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.dashboard-main {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem;
+}
+
+.top-header {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.top-header h1 {
+    font-size: clamp(1.45rem, 3vw, 2.3rem);
+    line-height: 1.1;
+    margin: 0;
+}
+
+.header-actions,
+.user-profile {
+    align-items: center;
+    display: flex;
+    gap: 0.8rem;
+}
+
+.user-profile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 0.55rem 0.75rem;
+}
+
+.user-profile > span {
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary), #7dd3fc);
+    border-radius: 14px;
+    display: flex;
+    font-weight: 800;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+}
+
+.user-profile small {
+    color: var(--muted);
+    display: block;
+    font-size: 0.75rem;
+}
+
+.mobile-sidebar-button {
+    display: none;
+}
+
+.welcome-card {
+    align-items: center;
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 1.4rem;
+}
+
+.welcome-card h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    margin: 0 0 0.6rem;
+}
+
+.welcome-card p {
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 720px;
+}
+
+.welcome-orb {
+    align-items: center;
+    background: var(--primary-soft);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    border-radius: 24px;
+    color: var(--accent);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 3rem;
+    height: 112px;
+    justify-content: center;
+    width: 112px;
+}
+
+.dashboard-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(300px, 0.9fr) minmax(380px, 1.1fr);
+}
+
+.lower-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
+}
+
+.panel {
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+.panel-heading {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.panel-heading h2 {
+    font-size: 1.2rem;
+}
+
+.summary-list {
+    color: var(--muted);
+    display: grid;
+    gap: 0.8rem;
+    line-height: 1.7;
+    margin: 1rem 0 0;
+    padding-left: 1.2rem;
+}
+
+.history-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.history-item {
+    align-items: center;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: grid;
+    gap: 0.2rem;
+    grid-template-columns: 1fr auto;
+    padding: 0.85rem;
+}
+
+.history-item small {
+    color: var(--muted);
+}
+
+.delete-history {
+    color: #fca5a5;
+}
+
+.empty-state {
+    color: var(--muted);
+    grid-template-columns: auto 1fr;
+}
+
+.modal-backdrop {
+    align-items: center;
+    background: rgba(2, 6, 23, 0.68);
+    display: none;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 50;
+}
+
+.modal-backdrop.is-open {
+    display: flex;
+}
+
+.modal {
+    border-radius: var(--radius);
+    max-width: 480px;
+    padding: 1.25rem;
+    width: 100%;
+}
+
+.modal-header,
+.setting-row {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.setting-row {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+.setting-row small,
+.modal-about {
+    color: var(--muted);
+}
+
+.switch input {
+    display: none;
+}
+
+.switch span {
+    background: var(--primary);
+    border-radius: 999px;
+    cursor: pointer;
+    display: block;
+    height: 30px;
+    position: relative;
+    width: 56px;
+}
+
+.switch span::after {
+    background: #ffffff;
+    border-radius: 50%;
+    content: "";
+    height: 22px;
+    left: 30px;
+    position: absolute;
+    top: 4px;
+    transition: left 180ms ease;
+    width: 22px;
+}
+
+.switch input:not(:checked) + span::after {
+    left: 4px;
+}
+
+.field {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.field select {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    padding: 0.85rem;
+}
+
+.toast {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    bottom: 1rem;
+    box-shadow: var(--shadow);
+    color: var(--text);
+    opacity: 0;
+    padding: 0.9rem 1rem;
+    pointer-events: none;
+    position: fixed;
+    right: 1rem;
+    transform: translateY(10px);
+    transition: opacity 180ms ease, transform 180ms ease;
+    z-index: 60;
+}
+
+.toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}

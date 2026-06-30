@@ -3,35 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartPDF AI</title>
+    <title>SmartPDF AI | Chat with Your PDFs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
 <body>
     {% include "components/navbar.html" %}
-    <main class="home-shell">
-        <section class="hero">
+
+    <main>
+        <section class="hero home-hero" id="home">
+            <div class="hero-glow"></div>
             <div class="hero-content">
-                <p class="eyebrow">AI PDF workspace</p>
-                <h1>SmartPDF AI</h1>
-                <p>Upload PDFs, prepare documents for retrieval, and ask questions from a polished Flask dashboard.</p>
+                <span class="eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> AI PDF assistant</span>
+                <h1>Chat with Your PDFs Using AI</h1>
+                <p>
+                    SmartPDF AI turns long documents into a focused conversation. Upload a PDF,
+                    ask natural questions, get summaries, and keep page-aware answers in one
+                    elegant workspace.
+                </p>
                 <div class="hero-actions">
-                    <a class="button primary" href="{{ url_for('home.dashboard') }}">Open Dashboard</a>
-                    <a class="button secondary" href="{{ url_for('home.about') }}">About Project</a>
+                    <a class="button primary" href="{{ url_for('home.dashboard') }}#upload-panel">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        Upload PDF
+                    </a>
+                    <a class="button secondary" href="#features">
+                        <i class="fa-regular fa-circle-play"></i>
+                        Learn More
+                    </a>
+                </div>
+                <div class="hero-trust">
+                    <span><i class="fa-solid fa-lock"></i> Private workspace</span>
+                    <span><i class="fa-solid fa-bolt"></i> Fast answers</span>
+                    <span><i class="fa-solid fa-book-open"></i> Page references</span>
                 </div>
             </div>
-            <div class="hero-panel">
-                <span class="panel-tag">Pipeline</span>
-                <ul>
-                    <li>PDF ingestion</li>
-                    <li>Chunk preparation</li>
-                    <li>Vector retrieval</li>
-                    <li>Ollama answers</li>
-                </ul>
+
+            <div class="hero-product-card glass-card" aria-label="SmartPDF AI preview">
+                <div class="mini-window-bar">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="document-preview">
+                    <div class="doc-icon"><i class="fa-regular fa-file-pdf"></i></div>
+                    <div>
+                        <strong>Research_Report.pdf</strong>
+                        <small>42 pages indexed</small>
+                    </div>
+                </div>
+                <div class="preview-chat">
+                    <div class="preview-bubble user">Summarize the key findings.</div>
+                    <div class="preview-bubble ai">
+                        The document highlights three major trends with supporting references.
+                        <span>Page 8</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="features">
+            <div class="section-heading">
+                <span class="eyebrow">Features</span>
+                <h2>Everything a serious PDF assistant needs.</h2>
+            </div>
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <i class="fa-solid fa-comments"></i>
+                    <h3>AI Question Answering</h3>
+                    <p>Ask direct questions and receive document-grounded responses.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-align-left"></i>
+                    <h3>PDF Summarization</h3>
+                    <p>Condense dense reports into clean, readable bullet points.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>Multi PDF Support</h3>
+                    <p>Prepare collections for cross-document research. Coming soon.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <h3>Fast Search</h3>
+                    <p>Find relevant context quickly with a retrieval-ready interface.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <h3>Page References</h3>
+                    <p>Keep answers traceable with compact page reference badges.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <h3>Chat History</h3>
+                    <p>Review recent prompts and continue where your research paused.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section how-section">
+            <div class="section-heading">
+                <span class="eyebrow">How it works</span>
+                <h2>From upload to answer in four simple steps.</h2>
+            </div>
+            <div class="steps">
+                <article class="step-card">
+                    <span>1</span>
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <h3>Upload PDF</h3>
+                </article>
+                <i class="fa-solid fa-arrow-down step-arrow"></i>
+                <article class="step-card">
+                    <span>2</span>
+                    <i class="fa-solid fa-brain"></i>
+                    <h3>AI Reads Document</h3>
+                </article>
+                <i class="fa-solid fa-arrow-down step-arrow"></i>
+                <article class="step-card">
+                    <span>3</span>
+                    <i class="fa-solid fa-message"></i>
+                    <h3>Ask Questions</h3>
+                </article>
+                <i class="fa-solid fa-arrow-down step-arrow"></i>
+                <article class="step-card">
+                    <span>4</span>
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h3>Receive Accurate Answers</h3>
+                </article>
             </div>
         </section>
     </main>
+
     {% include "components/footer.html" %}
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

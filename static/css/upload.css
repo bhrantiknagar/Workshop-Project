@@ -48,3 +48,107 @@
 .form-status {
     min-height: 1.5rem;
 }
+
+/* Upload experience and PDF info card. */
+.upload-panel {
+    display: grid;
+    gap: 1rem;
+}
+
+.upload-box {
+    gap: 1rem;
+}
+
+.drop-zone {
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(14, 165, 233, 0.05)),
+        var(--surface-muted);
+    border: 1px dashed rgba(96, 165, 250, 0.45);
+    border-radius: 20px;
+    min-height: 270px;
+    transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.drop-zone:hover,
+.drop-zone.is-dragging {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+
+.upload-icon {
+    background: var(--primary-soft);
+    border: 1px solid rgba(96, 165, 250, 0.28);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 2rem;
+    height: 70px;
+    width: 70px;
+}
+
+.drop-zone strong {
+    font-size: 1.05rem;
+}
+
+.drop-zone small,
+.progress-wrap span {
+    color: var(--muted);
+}
+
+.browse-button {
+    margin-top: 0.25rem;
+    pointer-events: none;
+}
+
+.progress-wrap {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.progress-track {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--primary), #7dd3fc);
+    border-radius: inherit;
+    height: 100%;
+    transition: width 260ms ease;
+    width: 0;
+}
+
+.pdf-info-card {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    display: grid;
+    gap: 0.7rem;
+    padding: 1rem;
+}
+
+.info-row {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.info-row span {
+    color: var(--muted);
+}
+
+.info-row strong {
+    max-width: 58%;
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.status-ready {
+    color: var(--success);
+}

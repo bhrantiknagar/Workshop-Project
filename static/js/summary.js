@@ -1,16 +1,10 @@
-// Requests a placeholder document summary from the Flask backend.
+// Handles frontend-only summary actions.
 document.addEventListener("DOMContentLoaded", () => {
-    const button = document.querySelector("#summaryButton");
-    const output = document.querySelector("#summaryOutput");
+    const downloadButton = document.querySelector("#downloadSummary");
 
-    if (!button || !output) {
-        return;
+    if (downloadButton) {
+        downloadButton.addEventListener("click", () => {
+            window.showToast("Summary download will be available after backend integration.");
+        });
     }
-
-    button.addEventListener("click", async () => {
-        output.textContent = "Preparing summary...";
-        const response = await fetch("/summary/generate", { method: "POST" });
-        const data = await response.json();
-        output.textContent = data.summary;
-    });
 });

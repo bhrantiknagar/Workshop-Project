@@ -1,20 +1,21 @@
 <section class="panel chat-panel" id="chat-panel">
     <div class="panel-heading">
         <div>
-            <p class="eyebrow">Assistant</p>
-            <h2>Ask a Question</h2>
+            <span class="eyebrow">Assistant</span>
+            <h2>Chat</h2>
         </div>
-        <button class="button secondary" id="summaryButton" type="button">Summarize</button>
+        <span class="badge"><i class="fa-solid fa-wand-magic-sparkles"></i> AI ready</span>
     </div>
+
     <div class="messages" id="messages">
         {% include "components/message.html" %}
     </div>
+
     <form class="chat-form" id="chatForm">
-        <input id="questionInput" name="question" type="text" placeholder="Ask about your uploaded PDF..." autocomplete="off">
-        <button class="button primary" type="submit">Send</button>
+        <input id="questionInput" name="question" type="text" placeholder="Ask anything about your PDF..." autocomplete="off">
+        <button class="button primary send-button" type="submit" aria-label="Send message">
+            <i class="fa-solid fa-paper-plane"></i>
+            Send
+        </button>
     </form>
-    <div class="summary-panel-inline" id="summary-panel">
-        <h3>Summary</h3>
-        <p id="summaryOutput">Upload a document and request a summary to preview generated notes here.</p>
-    </div>
 </section>

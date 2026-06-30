@@ -64,3 +64,46 @@
     height: 2px;
     width: 22px;
 }
+
+/* Landing page navigation. */
+.navbar {
+    backdrop-filter: blur(22px);
+    background: rgba(7, 11, 22, 0.72);
+    border-bottom: 1px solid var(--border);
+    height: 84px;
+    padding: 0 clamp(1.25rem, 5vw, 5rem);
+}
+
+.brand {
+    color: var(--text);
+    font-size: 1.05rem;
+}
+
+.brand-mark {
+    background: linear-gradient(135deg, var(--primary), #7dd3fc);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.3);
+    height: 42px;
+    width: 42px;
+}
+
+.nav-links {
+    align-items: center;
+    gap: 1.4rem;
+}
+
+.nav-links a {
+    color: var(--muted);
+    font-size: 0.94rem;
+}
+
+.nav-links a:hover {
+    color: var(--text);
+}
+
+.nav-cta {
+    background: var(--primary);
+    color: #ffffff !important;
+    min-height: 42px;
+    padding: 0.7rem 1rem;
+}

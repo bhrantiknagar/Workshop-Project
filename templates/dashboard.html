@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | SmartPDF AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
@@ -12,20 +16,41 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
-<body class="dashboard-body">
-    {% include "components/navbar.html" %}
-    <div class="app-layout">
+<body class="dashboard-body" id="dashboard">
+    <div class="app-shell">
         {% include "components/sidebar.html" %}
+
         <main class="dashboard-main">
-            <section class="dashboard-header">
+            <header class="top-header">
+                <button class="icon-button mobile-sidebar-button" type="button" aria-label="Open sidebar" data-sidebar-toggle>
+                    <i class="fa-solid fa-bars"></i>
+                </button>
                 <div>
-                    <p class="eyebrow">Workspace</p>
-                    <h1>PDF Question Answering</h1>
-                    <p>Prepare documents, ask focused questions, and review generated summaries from one dashboard.</p>
+                    <span class="eyebrow">Current PDF</span>
+                    <h1 id="currentPdfName">No PDF selected</h1>
                 </div>
-                <div class="status-card">
-                    <span class="status-dot"></span>
-                    <span>AI services pending integration</span>
+                <div class="header-actions">
+                    <button class="icon-button" type="button" aria-label="Open settings" data-modal-open="settingsModal">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                    <div class="user-profile">
+                        <span>SP</span>
+                        <div>
+                            <strong>Smart User</strong>
+                            <small>Free workspace</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="welcome-card glass-card">
+                <div>
+                    <span class="eyebrow">Start here</span>
+                    <h2>Upload a PDF to start chatting.</h2>
+                    <p>Drag a file into the upload area, watch the interface prepare it, then ask questions in the chat panel.</p>
+                </div>
+                <div class="welcome-orb">
+                    <i class="fa-regular fa-file-pdf"></i>
                 </div>
             </section>
 
@@ -33,8 +58,84 @@
                 {% include "components/upload_box.html" %}
                 {% include "components/chat_box.html" %}
             </section>
+
+            <section class="lower-grid">
+                <article class="panel summary-card" id="summary-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="eyebrow">Summary</span>
+                            <h2>Document Highlights</h2>
+                        </div>
+                        <button class="button secondary" type="button" id="downloadSummary">
+                            <i class="fa-solid fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                    <ul class="summary-list" id="summaryList">
+                        <li>Upload a PDF to generate executive-level bullet points.</li>
+                        <li>Important topics, themes, and page references will appear here.</li>
+                        <li>This is a frontend placeholder with production-ready states.</li>
+                    </ul>
+                </article>
+
+                <article class="panel history-card" id="history-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="eyebrow">History</span>
+                            <h2>Recent Questions</h2>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <div class="history-item empty-state">
+                            <i class="fa-regular fa-message"></i>
+                            <span>No questions yet</span>
+                            <small>Ask something about your PDF to build history.</small>
+                        </div>
+                    </div>
+                </article>
+            </section>
         </main>
     </div>
+
+    <div class="modal-backdrop" id="settingsModal" aria-hidden="true">
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow">Preferences</span>
+                    <h2 id="settingsTitle">Settings</h2>
+                </div>
+                <button class="icon-button" type="button" aria-label="Close settings" data-modal-close>
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <strong>Theme</strong>
+                    <small>Toggle between dark and dim light preview.</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="themeToggle" checked>
+                    <span></span>
+                </label>
+            </div>
+            <label class="field">
+                <span>Model</span>
+                <select id="modelSelect">
+                    <option>Ollama Llama 3.1</option>
+                    <option>Mistral Placeholder</option>
+                    <option>Gemma Placeholder</option>
+                </select>
+            </label>
+            <button class="button danger" type="button" id="clearHistory">
+                <i class="fa-solid fa-trash"></i>
+                Clear History
+            </button>
+            <p class="modal-about">SmartPDF AI is a premium frontend shell for an AI-powered PDF assistant.</p>
+        </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/upload.js') }}"></script>

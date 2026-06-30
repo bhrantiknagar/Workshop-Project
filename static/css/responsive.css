@@ -44,3 +44,128 @@
         flex-direction: column;
     }
 }
+
+/* Responsive production layout. */
+@media (max-width: 1120px) {
+    .feature-grid,
+    .dashboard-grid,
+    .lower-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .home-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .step-arrow {
+        justify-self: center;
+    }
+}
+
+@media (max-width: 860px) {
+    .navbar {
+        height: auto;
+        min-height: 76px;
+    }
+
+    .nav-links {
+        gap: 0.75rem;
+    }
+
+    .app-shell,
+    .dashboard-grid,
+    .lower-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        bottom: 0;
+        box-shadow: var(--shadow);
+        display: flex;
+        left: 0;
+        max-width: 320px;
+        position: fixed;
+        top: 0;
+        transform: translateX(-105%);
+        transition: transform 220ms ease;
+        width: 86vw;
+        z-index: 40;
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    .mobile-sidebar-button {
+        display: inline-flex;
+    }
+
+    .welcome-card,
+    .top-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .header-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .home-hero,
+    .section,
+    .dashboard-main {
+        padding: 1rem;
+    }
+
+    .home-hero {
+        padding-top: 3rem;
+    }
+
+    .nav-links a:not(.nav-cta) {
+        display: none;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2.5rem, 14vw, 4.2rem);
+    }
+
+    .hero-product-card,
+    .panel,
+    .welcome-card {
+        border-radius: 18px;
+    }
+
+    .user-profile div {
+        display: none;
+    }
+
+    .chat-form {
+        grid-template-columns: 1fr;
+    }
+
+    .message-content {
+        max-width: 86%;
+    }
+
+    .footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 900px) {
+    .nav-links {
+        display: flex;
+    }
+
+    .sidebar {
+        display: flex;
+    }
+}

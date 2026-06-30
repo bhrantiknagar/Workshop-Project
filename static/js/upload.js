@@ -1,33 +1,86 @@
-// Handles PDF upload requests from the dashboard.
+// Simulates PDF upload, indexing, and progress states without backend calls.
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("#uploadForm");
-    const status = document.querySelector("#uploadStatus");
     const fileInput = document.querySelector("#pdfFile");
+    const dropZone = document.querySelector("#dropZone");
+    const progress = document.querySelector("#uploadProgress");
+    const progressLabel = document.querySelector("#progressLabel");
+    const currentPdfName = document.querySelector("#currentPdfName");
+    const infoFilename = document.querySelector("#infoFilename");
+    const infoPages = document.querySelector("#infoPages");
+    const infoSize = document.querySelector("#infoSize");
+    const infoStatus = document.querySelector("#infoStatus");
 
-    if (!form || !status || !fileInput) {
+    if (!fileInput || !dropZone || !progress) {
         return;
     }
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    function formatSize(bytes) {
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
 
-        if (!fileInput.files.length) {
-            status.textContent = "Choose a PDF before uploading.";
+    function simulateUpload(file) {
+        if (!file.name.toLowerCase().endsWith(".pdf")) {
+            window.showToast("Please choose a PDF file.");
             return;
         }
 
-        const formData = new FormData(form);
-        status.textContent = "Uploading document...";
+        let value = 0;
+        progress.style.width = "0%";
+        progressLabel.textContent = "Uploading PDF...";
+        infoStatus.textContent = "Uploading";
+        infoStatus.classList.remove("status-ready");
 
-        try {
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData,
-            });
-            const data = await response.json();
-            status.textContent = data.message;
-        } catch (error) {
-            status.textContent = "Upload failed. Check the Flask server logs.";
+        const timer = window.setInterval(() => {
+            value += 12;
+            progress.style.width = `${Math.min(value, 100)}%`;
+
+            if (value >= 55) {
+                progressLabel.textContent = "Indexing document preview...";
+                infoStatus.textContent = "Indexing";
+            }
+
+            if (value >= 100) {
+                window.clearInterval(timer);
+                progressLabel.textContent = "Ready to chat";
+                infoFilename.textContent = file.name;
+                infoPages.textContent = String(Math.max(6, Math.round(file.size / 85000)));
+                infoSize.textContent = formatSize(file.size);
+                infoStatus.textContent = "Ready";
+                infoStatus.classList.add("status-ready");
+
+                if (currentPdfName) {
+                    currentPdfName.textContent = file.name;
+                }
+
+                window.showToast("PDF uploaded and indexed in preview mode.");
+            }
+        }, 180);
+    }
+
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length) {
+            simulateUpload(fileInput.files[0]);
+        }
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            dropZone.classList.add("is-dragging");
+        });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            dropZone.classList.remove("is-dragging");
+        });
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+        const file = event.dataTransfer.files[0];
+        if (file) {
+            simulateUpload(file);
         }
     });
 });

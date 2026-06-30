@@ -42,3 +42,73 @@
 .sidebar-note strong {
     color: var(--text);
 }
+
+/* Dashboard sidebar. */
+.sidebar {
+    backdrop-filter: blur(24px);
+    background: rgba(7, 11, 22, 0.88);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    height: 100vh;
+    min-height: 100vh;
+    padding: 1.25rem;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-brand {
+    align-items: center;
+    display: flex;
+    gap: 0.8rem;
+    min-height: 52px;
+}
+
+.sidebar-nav {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.sidebar-link {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 14px;
+    color: var(--muted);
+    display: flex;
+    font-weight: 600;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0.85rem 0.9rem;
+    text-align: left;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+    width: 100%;
+}
+
+.sidebar-link i {
+    color: var(--subtle);
+    width: 18px;
+}
+
+.sidebar-link.active,
+.sidebar-link:hover {
+    background: var(--primary-soft);
+    color: var(--text);
+    transform: translateX(2px);
+}
+
+.sidebar-button {
+    cursor: pointer;
+}
+
+.sidebar-note {
+    background: var(--surface-muted);
+    margin-top: auto;
+}
+
+.sidebar-note p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0.75rem 0 0;
+}

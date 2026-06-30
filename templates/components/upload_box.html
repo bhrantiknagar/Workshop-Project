@@ -1,19 +1,44 @@
 <section class="panel upload-panel" id="upload-panel">
     <div class="panel-heading">
         <div>
-            <p class="eyebrow">Document</p>
+            <span class="eyebrow">Document</span>
             <h2>Upload PDF</h2>
         </div>
-        <span class="badge">PDF only</span>
+        <span class="badge"><i class="fa-regular fa-file-pdf"></i> PDF only</span>
     </div>
-    <form class="upload-box" id="uploadForm" enctype="multipart/form-data">
+
+    <form class="upload-box" id="uploadForm">
         <input id="pdfFile" name="pdf" type="file" accept="application/pdf">
-        <label for="pdfFile">
-            <span class="upload-icon">+</span>
-            <strong>Choose a PDF</strong>
-            <small>Maximum size: 25 MB</small>
+        <label class="drop-zone" for="pdfFile" id="dropZone">
+            <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+            <strong>Drag and drop your PDF here</strong>
+            <small>or browse from your device</small>
+            <span class="button secondary browse-button">Browse File</span>
         </label>
-        <button class="button primary" type="submit">Upload Document</button>
+        <div class="progress-wrap" aria-label="Upload progress">
+            <span id="progressLabel">Waiting for PDF</span>
+            <div class="progress-track">
+                <div class="progress-bar" id="uploadProgress"></div>
+            </div>
+        </div>
     </form>
-    <p class="form-status" id="uploadStatus" aria-live="polite"></p>
+
+    <article class="pdf-info-card" id="pdfInfo">
+        <div class="info-row">
+            <span>Filename</span>
+            <strong id="infoFilename">Not uploaded</strong>
+        </div>
+        <div class="info-row">
+            <span>Pages</span>
+            <strong id="infoPages">--</strong>
+        </div>
+        <div class="info-row">
+            <span>File Size</span>
+            <strong id="infoSize">--</strong>
+        </div>
+        <div class="info-row">
+            <span>Status</span>
+            <strong class="status-ready" id="infoStatus">Idle</strong>
+        </div>
+    </article>
 </section>

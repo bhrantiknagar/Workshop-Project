@@ -1,16 +1,11 @@
 <nav class="navbar">
-    <a class="brand" href="{{ url_for('home.index') }}">
-        <span class="brand-mark">S</span>
+    <a class="brand" href="{{ url_for('home.index') }}" aria-label="SmartPDF AI home">
+        <span class="brand-mark"><i class="fa-solid fa-file-lines"></i></span>
         <span>SmartPDF AI</span>
     </a>
-    <button class="icon-button menu-toggle" type="button" aria-label="Toggle navigation" data-sidebar-toggle>
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
     <div class="nav-links">
         <a href="{{ url_for('home.index') }}">Home</a>
-        <a href="{{ url_for('home.dashboard') }}">Dashboard</a>
         <a href="{{ url_for('home.about') }}">About</a>
+        <a class="button nav-cta" href="{{ url_for('home.dashboard') }}">Get Started</a>
     </div>
 </nav>
