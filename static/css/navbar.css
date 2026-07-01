@@ -178,3 +178,17 @@
 .navbar .nav-links {
     justify-content: flex-end;
 }
+
+.navbar {
+    background: #ffffff;
+    border-bottom: 0;
+    margin: 0;
+    max-width: none;
+    padding: 24px 40px;
+    width: 100%;
+}
+
+.navbar .brand-mark {
+    background: linear-gradient(135deg, #2563eb, #14b8a6);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+}

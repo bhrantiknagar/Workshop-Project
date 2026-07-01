@@ -18,41 +18,54 @@
 </head>
 <body class="dashboard-body" id="dashboard">
     {% include "components/navbar.html" %}
-    <main>
-        <section class="single-page-shell">
-            <header class="upload-page-header">
-                <span class="eyebrow"><i class="fa-solid fa-file-lines"></i> PDF workspace</span>
-                <h1>Upload a PDF and start asking questions.</h1>
-                <p>Choose a document, review its details, then use the chat area to work with the file.</p>
-            </header>
+    <main class="centered-upload-page">
+        <section class="prompt-shell">
+            <h1>What PDF should we understand?</h1>
+            <p>Upload a PDF, then ask questions, create a summary, or find important details.</p>
 
-            <section class="workspace-grid one-page-workspace">
-                <div class="left-column">
-                    {% include "components/upload_box.html" %}
-                    <article class="panel summary-card" id="summary-panel">
-                        <div class="panel-heading">
-                            <div>
-                                <span class="eyebrow">Notes</span>
-                                <h2>Summary</h2>
-                            </div>
-                            <button class="button secondary" type="button" id="downloadSummary">
-                                <i class="fa-solid fa-download"></i>
-                                Download
-                            </button>
-                        </div>
-                        <p class="summary-copy">Upload a document to preview a concise summary.</p>
-                        <ul class="summary-list" id="summaryList">
-                            <li>Key points will appear here.</li>
-                            <li>Important topics will be grouped clearly.</li>
-                            <li>References can be added when the backend is connected.</li>
-                        </ul>
-                    </article>
+            <form class="prompt-upload" id="uploadForm">
+                <input id="pdfFile" name="pdf" type="file" accept="application/pdf">
+                <label class="prompt-drop-zone" for="pdfFile" id="dropZone">
+                    <span><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                    <strong>Upload PDF</strong>
+                    <small>Drag and drop or browse from your device</small>
+                </label>
+                <div class="progress-wrap" aria-label="Upload progress">
+                    <span id="progressLabel">Waiting for PDF</span>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="uploadProgress"></div>
+                    </div>
                 </div>
+            </form>
 
-                <div class="right-column">
-                    {% include "components/chat_box.html" %}
+            <article class="prompt-file-card" id="uploadedFileCard" hidden>
+                <div>
+                    <i class="fa-regular fa-file-pdf"></i>
+                    <div>
+                        <strong id="uploadedFilename">Document.pdf</strong>
+                        <small id="uploadedMeta">Ready</small>
+                    </div>
                 </div>
-            </section>
+                <button class="icon-button delete-file-button" type="button" id="deleteUploadedFile" aria-label="Remove uploaded file">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </article>
+
+            <div class="prompt-examples" aria-label="Example questions">
+                <button type="button">Summarize this PDF</button>
+                <button type="button">Find key points</button>
+                <button type="button">Explain a topic</button>
+                <button type="button">Create notes</button>
+            </div>
+
+            <div class="prompt-meta" aria-live="polite">
+                <span id="infoFilename">Not uploaded</span>
+                <span id="infoPages">--</span>
+                <span id="infoSize">--</span>
+                <span id="infoDate">--</span>
+                <span id="infoStatus">Idle</span>
+                <span id="infoLastQuestion">--</span>
+            </div>
         </section>
     </main>
 
@@ -61,7 +74,5 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/summary.js') }}"></script>
 </body>
 </html>
