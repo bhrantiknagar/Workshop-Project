@@ -11,6 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const infoStatus = document.querySelector("#infoStatus");
     const emptyState = document.querySelector("#emptyState");
     const uploadedFileList = document.querySelector("#uploadedFileList");
+    const previewModal = document.querySelector("#pdfPreviewModal");
+    const previewTitle = document.querySelector("#previewTitle");
+    const previewMeta = document.querySelector("#previewMeta");
+    const previewContent = document.querySelector("#previewContent");
+    const previewClose = document.querySelector("#previewClose");
+    let uploadedPdfs = [];
 
     if (!fileInput || !dropZone || !progress) {
         return;
@@ -33,9 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         <small></small>
                     </div>
                 </div>
+                <button class="preview-button" type="button">Preview</button>
             `;
             row.querySelector("strong").textContent = file.filename;
-            row.querySelector("small").textContent = `${file.file_size} - ${file.pages} pages`;
+            row.querySelector("small").textContent = `${file.file_size} - ${file.total_pages} pages - ${file.status}`;
+            row.querySelector(".preview-button").dataset.previewId = file.id;
             uploadedFileList.appendChild(row);
         });
 
@@ -50,7 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function setUploadState(data) {
         const files = data.files || [];
-        const totalPages = files.reduce((sum, file) => sum + file.pages, 0);
+        const totalPages = files.reduce((sum, file) => sum + file.total_pages, 0);
+        uploadedPdfs = files;
 
         progress.style.width = "100%";
         progressLabel.textContent = "Ready";
@@ -143,6 +152,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function closePreview() {
+        if (!previewModal) {
+            return;
+        }
+        previewModal.classList.remove("is-open");
+        previewModal.setAttribute("aria-hidden", "true");
+    }
+
+    function openPreview(pdfId) {
+        const pdf = uploadedPdfs.find((item) => item.id === pdfId);
+        if (!pdf || !previewModal || !previewContent) {
+            return;
+        }
+
+        previewTitle.textContent = pdf.filename;
+        previewMeta.textContent = `${pdf.total_pages} pages`;
+        if (pdf.metadata?.title || pdf.metadata?.author) {
+            previewMeta.textContent += ` - ${pdf.metadata.title || "Untitled"}${pdf.metadata.author ? ` by ${pdf.metadata.author}` : ""}`;
+        }
+
+        previewContent.innerHTML = "";
+        pdf.pages.forEach((page) => {
+            const section = document.createElement("section");
+            section.className = "preview-page";
+            section.innerHTML = "<h3></h3><pre></pre>";
+            section.querySelector("h3").textContent = `Page ${page.page}`;
+            section.querySelector("pre").textContent = page.text || "No extractable text found on this page.";
+            previewContent.appendChild(section);
+        });
+
+        previewModal.classList.add("is-open");
+        previewModal.setAttribute("aria-hidden", "false");
+    }
+
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length) {
             uploadFiles(fileInput.files);
@@ -171,6 +214,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     uploadedFileList?.addEventListener("click", (event) => {
+        const previewButton = event.target.closest("[data-preview-id]");
+        if (previewButton) {
+            openPreview(previewButton.dataset.previewId);
+            return;
+        }
+
         const button = event.target.closest("[data-clear-upload]");
         if (!button) {
             return;
@@ -193,6 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         uploadedFileList.hidden = true;
         uploadedFileList.innerHTML = "";
+        uploadedPdfs = [];
         emptyState?.classList.remove("is-hidden");
 
         if (currentPdfName) {
@@ -200,5 +250,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         window.showToast("Uploaded file removed.");
+    });
+
+    previewClose?.addEventListener("click", closePreview);
+    previewModal?.addEventListener("click", (event) => {
+        if (event.target === previewModal) {
+            closePreview();
+        }
     });
 });

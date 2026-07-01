@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import fitz
-
 from utils.file_handler import save_uploaded_file
 
 
@@ -14,10 +12,14 @@ def _format_file_size(size_bytes):
     return f"{size_bytes / (1024 * 1024):.2f} MB"
 
 
-def _count_pdf_pages(pdf_path):
-    """Count pages in a PDF using PyMuPDF."""
-    with fitz.open(pdf_path) as document:
-        return document.page_count
+def _get_fitz():
+    """Import PyMuPDF only when PDF reading is needed."""
+    try:
+        import fitz  # pylint: disable=import-outside-toplevel
+    except ModuleNotFoundError as error:
+        raise PDFProcessingError("PyMuPDF is not installed.") from error
+
+    return fitz
 
 
 class PDFProcessingError(Exception):
@@ -26,9 +28,11 @@ class PDFProcessingError(Exception):
 
 def _read_pdf_document(pdf_path):
     """Open and validate a PDF document with user-friendly errors."""
+    fitz = _get_fitz()
+
     try:
         document = fitz.open(pdf_path)
-    except (fitz.FileDataError, fitz.EmptyFileError, RuntimeError) as error:
+    except Exception as error:
         raise PDFProcessingError("This PDF appears to be corrupted.") from error
 
     if document.needs_pass:
@@ -46,7 +50,8 @@ def _extract_pdf_data(pdf_path, filename, pdf_id):
     """Extract metadata and page-by-page text from a saved PDF."""
     size_bytes = Path(pdf_path).stat().st_size
 
-    with _read_pdf_document(pdf_path) as document:
+    document = _read_pdf_document(pdf_path)
+    try:
         metadata = document.metadata or {}
         pages = [
             {
@@ -69,6 +74,8 @@ def _extract_pdf_data(pdf_path, filename, pdf_id):
             "pages": pages,
             "status": "Ready",
         }
+    finally:
+        document.close()
 
 
 def save_pdf(file_storage, upload_folder, pdf_id="pdf_001"):

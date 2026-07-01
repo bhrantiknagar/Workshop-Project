@@ -49,6 +49,21 @@
 
         </section>
     </main>
+    <div class="preview-modal" id="pdfPreviewModal" aria-hidden="true">
+        <section class="preview-panel" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+            <header>
+                <div>
+                    <span>PDF Preview</span>
+                    <h2 id="previewTitle">Extracted text</h2>
+                    <p id="previewMeta"></p>
+                </div>
+                <button type="button" class="preview-close" id="previewClose" aria-label="Close preview">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+            <div class="preview-content" id="previewContent"></div>
+        </section>
+    </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
