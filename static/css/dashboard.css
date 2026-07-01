@@ -477,3 +477,45 @@
 .toast {
     border-radius: 8px;
 }
+
+.dashboard-search {
+    align-items: center;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    display: flex;
+    flex: 1 1 260px;
+    gap: 8px;
+    max-width: 360px;
+    padding: 0 12px;
+}
+
+.dashboard-search input {
+    background: transparent;
+    border: 0;
+    color: var(--text);
+    min-height: 38px;
+    outline: 0;
+    width: 100%;
+}
+
+.dashboard-search input::placeholder {
+    color: var(--muted);
+}
+
+.empty-state-card .button {
+    margin-top: 16px;
+}
+
+.document-card h3 {
+    font-size: 16px;
+    margin: 0 0 12px;
+}
+
+.summary-copy {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 12px;
+}

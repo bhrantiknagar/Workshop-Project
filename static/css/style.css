@@ -759,3 +759,45 @@ body {
 .hero-glow {
     display: none;
 }
+
+/* Final brief palette and compact sizing. */
+:root {
+    --bg: #0f172a;
+    --bg-soft: #111827;
+    --surface: #1e293b;
+    --surface-strong: #1e293b;
+    --surface-muted: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --subtle: #94a3b8;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-soft: rgba(37, 99, 235, 0.14);
+    --border: #334155;
+    --radius: 10px;
+}
+
+.home-hero {
+    min-height: 70vh;
+    padding-bottom: 32px;
+    padding-top: 48px;
+}
+
+.hero-content h1 {
+    font-size: clamp(42px, 5vw, 48px);
+}
+
+.hero-content p {
+    max-width: 620px;
+}
+
+.feature-card,
+.step-card,
+.hero-product-card,
+.panel {
+    border-radius: 10px;
+}
+
+.steps {
+    align-items: center;
+}

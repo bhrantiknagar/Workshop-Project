@@ -279,3 +279,9 @@
 .chat-form input {
     border-radius: 8px;
 }
+
+.message-time {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}

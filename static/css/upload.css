@@ -236,3 +236,11 @@
     background: var(--bg-soft);
     border-radius: 12px;
 }
+
+.drop-zone small {
+    font-size: 14px;
+}
+
+.document-card {
+    margin-top: 0;
+}

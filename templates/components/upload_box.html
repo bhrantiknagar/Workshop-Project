@@ -4,7 +4,7 @@
             <span class="eyebrow">Document</span>
             <h2>Upload PDF</h2>
         </div>
-        <span class="badge"><i class="fa-regular fa-file-pdf"></i> PDF only</span>
+        <span class="badge"><i class="fa-regular fa-file-pdf"></i> PDF</span>
     </div>
 
     <form class="upload-box" id="uploadForm">
@@ -12,7 +12,7 @@
         <label class="drop-zone" for="pdfFile" id="dropZone">
             <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
             <strong>Drag and drop your PDF here</strong>
-            <small>Supported: PDF only</small>
+            <small>Supported: PDF · DOCX coming soon</small>
             <span class="button secondary browse-button">Browse File</span>
         </label>
         <div class="progress-wrap" aria-label="Upload progress">
@@ -36,7 +36,8 @@
         </button>
     </article>
 
-    <article class="pdf-info-card" id="pdfInfo">
+    <article class="pdf-info-card document-card" id="pdfInfo">
+        <h3>Document Details</h3>
         <div class="info-row">
             <span>Filename</span>
             <strong id="infoFilename">Not uploaded</strong>
@@ -50,12 +51,16 @@
             <strong id="infoSize">--</strong>
         </div>
         <div class="info-row">
-            <span>Upload Date</span>
+            <span>Upload Time</span>
             <strong id="infoDate">--</strong>
         </div>
         <div class="info-row">
             <span>Status</span>
             <strong class="status-ready" id="infoStatus">Idle</strong>
+        </div>
+        <div class="info-row">
+            <span>Last Question</span>
+            <strong id="infoLastQuestion">--</strong>
         </div>
     </article>
 </section>

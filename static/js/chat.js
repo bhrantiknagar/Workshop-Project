@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const messages = document.querySelector("#messages");
     const historyList = document.querySelector("#historyList");
     const clearHistory = document.querySelector("#clearHistory");
+    const lastQuestion = document.querySelector("#infoLastQuestion");
 
     if (!form || !input || !messages) {
         return;
@@ -21,6 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function createMessage(text, type, page) {
+        const time = new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
         const row = document.createElement("div");
         row.className = `message ${type}-message`;
         row.innerHTML = `
@@ -33,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         Copy
                     </button>
                     <span class="page-badge">Page ${page}</span>
+                    <span class="message-time">${time}</span>
                 </div>
             </div>
         `;
@@ -90,6 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         createMessage(question, "user", "--");
         addHistory(question);
+        if (lastQuestion) {
+            lastQuestion.textContent = question;
+        }
         input.value = "";
 
         const typing = addTyping();

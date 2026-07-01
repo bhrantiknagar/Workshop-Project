@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const infoSize = document.querySelector("#infoSize");
     const infoDate = document.querySelector("#infoDate");
     const infoStatus = document.querySelector("#infoStatus");
+    const infoLastQuestion = document.querySelector("#infoLastQuestion");
     const emptyState = document.querySelector("#emptyState");
     const uploadedFileCard = document.querySelector("#uploadedFileCard");
     const uploadedFilename = document.querySelector("#uploadedFilename");
@@ -51,15 +52,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 infoFilename.textContent = file.name;
                 infoPages.textContent = String(Math.max(6, Math.round(file.size / 85000)));
                 infoSize.textContent = formatSize(file.size);
-                infoDate.textContent = new Date().toLocaleDateString(undefined, {
+                infoDate.textContent = new Date().toLocaleString(undefined, {
                     month: "short",
                     day: "numeric",
-                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
                 });
                 infoStatus.textContent = "Ready";
                 infoStatus.classList.add("status-ready");
                 uploadedFilename.textContent = file.name;
-                uploadedMeta.textContent = `${formatSize(file.size)} · PDF`;
+                uploadedMeta.textContent = `${formatSize(file.size)} - PDF`;
                 uploadedFileCard.hidden = false;
                 emptyState?.classList.add("is-hidden");
 
@@ -108,6 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
         infoSize.textContent = "--";
         infoDate.textContent = "--";
         infoStatus.textContent = "Idle";
+        if (infoLastQuestion) {
+            infoLastQuestion.textContent = "--";
+        }
         uploadedFileCard.hidden = true;
         emptyState?.classList.remove("is-hidden");
 
