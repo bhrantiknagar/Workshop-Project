@@ -133,3 +133,48 @@
     border-radius: 8px;
     min-height: 38px;
 }
+
+/* White minimal navbar. */
+.navbar {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    padding: 0 24px;
+}
+
+.brand {
+    color: var(--text);
+}
+
+.brand-mark {
+    background: var(--text);
+    border-radius: 8px;
+    color: #ffffff;
+    height: 32px;
+    width: 32px;
+}
+
+.nav-links {
+    gap: 22px;
+}
+
+.nav-links a {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--text);
+}
+
+.nav-cta {
+    background: var(--primary);
+    color: #ffffff !important;
+    min-height: 38px;
+    padding: 0 14px;
+}
+
+.navbar .nav-links {
+    justify-content: flex-end;
+}

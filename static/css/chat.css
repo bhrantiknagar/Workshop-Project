@@ -285,3 +285,40 @@
     font-size: 12px;
     font-weight: 500;
 }
+
+/* White conversation surface. */
+.messages {
+    background: var(--bg-soft);
+    border-color: var(--border);
+}
+
+.avatar {
+    background: var(--text);
+    color: #ffffff;
+}
+
+.message-content p,
+.message p {
+    background: #ffffff;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.user-message .message-content p {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.copy-button,
+.page-badge,
+.delete-history,
+.typing {
+    background: #ffffff;
+    border-color: var(--border);
+}
+
+.chat-form input {
+    background: #ffffff;
+    border-color: var(--border);
+    color: var(--text);
+}

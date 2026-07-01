@@ -244,3 +244,46 @@
 .document-card {
     margin-top: 0;
 }
+
+/* White upload surface. */
+.drop-zone {
+    background: var(--bg-soft);
+    border: 1px dashed var(--border);
+}
+
+.drop-zone:hover,
+.drop-zone.is-dragging {
+    background: #ffffff;
+    border-color: var(--primary);
+}
+
+.upload-icon {
+    background: #ffffff;
+    border-color: var(--border);
+}
+
+.progress-track {
+    background: #eef2f7;
+    border: 0;
+}
+
+.progress-bar {
+    background: var(--primary);
+}
+
+.uploaded-file-card,
+.pdf-info-card {
+    background: var(--bg-soft);
+    border-color: var(--border);
+}
+
+.info-row span,
+.uploaded-file-card small,
+.progress-wrap span {
+    color: var(--muted);
+}
+
+.info-row strong,
+.uploaded-file-card strong {
+    color: var(--text);
+}
