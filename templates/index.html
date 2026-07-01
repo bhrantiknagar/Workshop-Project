@@ -17,15 +17,15 @@
 
     <main class="centered-upload-page">
         <section class="prompt-shell">
-            <h1>What PDF should we understand?</h1>
-            <p>Upload a PDF, then ask questions, create a summary, or find important details.</p>
+            <h1>What PDFs should we understand?</h1>
+            <p>Upload up to 3 PDFs, then ask questions, create a summary, or find important details.</p>
 
             <form class="prompt-upload" id="uploadForm">
-                <input id="pdfFile" name="pdf" type="file" accept="application/pdf">
+                <input id="pdfFile" name="pdf" type="file" accept="application/pdf" multiple>
                 <label class="prompt-drop-zone" for="pdfFile" id="dropZone">
                     <span><i class="fa-solid fa-cloud-arrow-up"></i></span>
-                    <strong>Upload PDF</strong>
-                    <small>Drag and drop or browse from your device</small>
+                    <strong>Upload PDFs</strong>
+                    <small>Select 1 to 3 PDFs or drag them here</small>
                 </label>
                 <div class="progress-wrap" aria-label="Upload progress">
                     <span id="progressLabel">Waiting for PDF</span>
@@ -35,34 +35,15 @@
                 </div>
             </form>
 
-            <article class="prompt-file-card" id="uploadedFileCard" hidden>
-                <div>
-                    <i class="fa-regular fa-file-pdf"></i>
-                    <div>
-                        <strong id="uploadedFilename">Document.pdf</strong>
-                        <small id="uploadedMeta">Ready</small>
-                    </div>
-                </div>
-                <button class="icon-button delete-file-button" type="button" id="deleteUploadedFile" aria-label="Remove uploaded file">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </article>
+            <div class="prompt-file-list" id="uploadedFileList" hidden></div>
 
             <div class="prompt-examples" aria-label="Example questions">
-                <button type="button">Summarize this PDF</button>
+                <button type="button">Summarize these PDFs</button>
                 <button type="button">Find key points</button>
                 <button type="button">Explain a topic</button>
                 <button type="button">Create notes</button>
             </div>
 
-            <div class="prompt-meta" aria-live="polite">
-                <span id="infoFilename">Not uploaded</span>
-                <span id="infoPages">--</span>
-                <span id="infoSize">--</span>
-                <span id="infoDate">--</span>
-                <span id="infoStatus">Idle</span>
-                <span id="infoLastQuestion">--</span>
-            </div>
         </section>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

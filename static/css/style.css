@@ -1235,6 +1235,36 @@ body.light-theme {
     text-align: left;
 }
 
+.prompt-file-list {
+    display: grid;
+    gap: 10px;
+    margin: 16px auto 0;
+    max-width: 760px;
+}
+
+.prompt-file-list[hidden] {
+    display: none;
+}
+
+.prompt-file-list .prompt-file-card {
+    margin: 0;
+}
+
+.prompt-clear-button {
+    background: transparent;
+    border: 0;
+    color: #6b7280;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    justify-self: center;
+    padding: 4px 8px;
+}
+
+.prompt-clear-button:hover {
+    color: #ef4444;
+}
+
 .prompt-file-card[hidden] {
     display: none;
 }
@@ -1261,10 +1291,4 @@ body.light-theme {
 .prompt-file-card small {
     color: #6b7280;
     font-size: 13px;
-}
-
-.prompt-meta {
-    color: #9ca3af;
-    display: none;
-    font-size: 12px;
 }

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         toast.textContent = message;
         toast.classList.add("is-visible");
-        window.setTimeout(() => toast.classList.remove("is-visible"), 2600);
+        window.setTimeout(() => toast.classList.remove("is-visible"), 3000);
     };
 
     modalButtons.forEach((button) => {
