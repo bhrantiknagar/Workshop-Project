@@ -25,5 +25,6 @@ class Config:
     LOG_FILE = BASE_DIR / "logs" / "smartpdf.log"
 
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3:latest")
+    OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "180"))
     ALLOWED_EXTENSIONS = {"pdf"}

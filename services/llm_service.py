@@ -40,10 +40,17 @@ def _resolve_model(model: Optional[str] = None) -> str:
     return candidate
 
 
-def generate_llm_response(prompt: str, model: Optional[str] = None, timeout: int = 30) -> str:
+def generate_llm_response(prompt: str, model: Optional[str] = None, timeout: Optional[int] = None) -> str:
     """Send a prompt to Ollama and return the generated response."""
     if not isinstance(prompt, str) or not prompt.strip():
         raise LLMServiceError("The prompt cannot be empty.", "empty_prompt", 400)
+
+    if timeout is None:
+        timeout = (
+            current_app.config.get("OLLAMA_TIMEOUT")
+            if has_app_context()
+            else Config.OLLAMA_TIMEOUT
+        )
 
     resolved_model = _resolve_model(model)
     base_url = Config.OLLAMA_BASE_URL.rstrip("/")
@@ -66,17 +73,37 @@ def generate_llm_response(prompt: str, model: Optional[str] = None, timeout: int
             data = json.loads(body)
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="ignore")
-        if exc.code == 404:
+        if exc.code == 404 and ":" not in resolved_model:
+            fallback_model = f"{resolved_model}:latest"
+            payload["model"] = fallback_model
+            try:
+                fallback_request = Request(
+                    url,
+                    data=json.dumps(payload).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urlopen(fallback_request, timeout=timeout) as response:
+                    body = response.read().decode("utf-8")
+                    data = json.loads(body)
+            except HTTPError:
+                raise LLMServiceError(
+                    "The requested Ollama model was not found. Pull it with `ollama pull <model>`.",
+                    "missing_model",
+                    404,
+                ) from exc
+        elif exc.code == 404:
             raise LLMServiceError(
                 "The requested Ollama model was not found. Pull it with `ollama pull <model>`.",
                 "missing_model",
                 404,
             ) from exc
-        raise LLMServiceError(
-            f"Ollama returned an HTTP error: {detail or exc.reason}",
-            "ollama_error",
-            exc.code,
-        ) from exc
+        else:
+            raise LLMServiceError(
+                f"Ollama returned an HTTP error: {detail or exc.reason}",
+                "ollama_error",
+                exc.code,
+            ) from exc
     except URLError as exc:
         reason = getattr(exc, "reason", exc)
         raise LLMServiceError(
