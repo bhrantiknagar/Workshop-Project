@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 
-from services.llm_service import answer_question
+from services.llm_service import LLMServiceError, answer_question
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/chat")
 
@@ -16,5 +16,9 @@ def ask_question():
     if not question:
         return jsonify({"answer": "Please enter a question."}), 400
 
-    answer = answer_question(question)
+    try:
+        answer = answer_question(question)
+    except LLMServiceError as exc:
+        return jsonify({"answer": str(exc)}), exc.status_code
+
     return jsonify({"answer": answer})

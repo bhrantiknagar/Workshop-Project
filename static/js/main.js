@@ -46,6 +46,44 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const llmPrompt = document.querySelector("#llmPrompt");
+    const llmGenerateButton = document.querySelector("#llmGenerateButton");
+    const llmStatus = document.querySelector("#llmStatus");
+    const llmResponse = document.querySelector("#llmResponse");
+
+    if (llmGenerateButton && llmPrompt && llmStatus && llmResponse) {
+        llmGenerateButton.addEventListener("click", async () => {
+            const prompt = llmPrompt.value.trim();
+            if (!prompt) {
+                llmResponse.textContent = "Please enter a prompt first.";
+                llmStatus.textContent = "Empty prompt";
+                return;
+            }
+
+            llmStatus.textContent = "Generating...";
+            llmResponse.textContent = "";
+
+            try {
+                const response = await fetch("/api/test-llm", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ prompt }),
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(payload.error || "LLM request failed.");
+                }
+
+                llmResponse.textContent = payload.response || "No response received.";
+                llmStatus.textContent = "Ready";
+            } catch (error) {
+                llmResponse.textContent = error.message;
+                llmStatus.textContent = "Error";
+            }
+        });
+    }
+
     if (themeToggle) {
         themeToggle.addEventListener("change", () => {
             const mode = themeToggle.value;
