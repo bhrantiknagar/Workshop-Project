@@ -1,0 +1,10 @@
+2026-07-02 02:04:54,209 ERROR: PDF upload failed
+Traceback (most recent call last):
+  File "D:\Workshop_Project\routes\upload.py", line 21, in upload_pdf
+    result = save_pdf(file, current_app.config["UPLOAD_FOLDER"])
+  File "D:\Workshop_Project\services\pdf_service.py", line 27, in save_pdf
+    page_count = _count_pdf_pages(saved_path)
+  File "D:\Workshop_Project\services\pdf_service.py", line 19, in _count_pdf_pages
+    with fitz.open(pdf_path) as document:
+         ^^^^^^^^^
+AttributeError: module 'fitz' has no attribute 'open'

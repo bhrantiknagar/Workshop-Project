@@ -15,7 +15,11 @@ from utils.logger import configure_logger
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder="../frontend/templates",
+        static_folder="../frontend/static",
+    )
     app.config.from_object(config_class)
 
     configure_logger(app)
