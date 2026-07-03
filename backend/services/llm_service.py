@@ -26,9 +26,10 @@ def _resolve_model(model: Optional[str] = None) -> str:
     if model is not None:
         candidate = model.strip()
     elif has_app_context():
-        candidate = current_app.config.get("OLLAMA_MODEL", Config.OLLAMA_MODEL)
+        # prefer MODEL_NAME (new config) falling back to legacy OLLAMA_MODEL
+        candidate = current_app.config.get("MODEL_NAME", current_app.config.get("OLLAMA_MODEL", Config.OLLAMA_MODEL))
     else:
-        candidate = Config.OLLAMA_MODEL
+        candidate = Config.MODEL_NAME if hasattr(Config, "MODEL_NAME") else Config.OLLAMA_MODEL
 
     candidate = candidate.strip() if isinstance(candidate, str) else ""
     if not candidate:
@@ -88,13 +89,13 @@ def generate_llm_response(prompt: str, model: Optional[str] = None, timeout: Opt
                     data = json.loads(body)
             except HTTPError:
                 raise LLMServiceError(
-                    "The requested Ollama model was not found. Pull it with `ollama pull <model>`.",
+                    f"The requested Ollama model '{fallback_model}' was not found. Pull it with `ollama pull {fallback_model}`.",
                     "missing_model",
                     404,
                 ) from exc
         elif exc.code == 404:
             raise LLMServiceError(
-                "The requested Ollama model was not found. Pull it with `ollama pull <model>`.",
+                f"The requested Ollama model '{resolved_model}' was not found. Pull it with `ollama pull {resolved_model}`.",
                 "missing_model",
                 404,
             ) from exc
