@@ -17,6 +17,7 @@ def health():
 def test_llm():
     """Send a temporary prompt to the local Ollama backend."""
     payload = request.get_json(silent=True) or {}
+    # parsed payload is available as `payload`
     prompt = (payload.get("prompt") or "").strip()
 
     if not prompt:

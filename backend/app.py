@@ -11,6 +11,7 @@ from routes.home import home_bp
 from routes.summary import summary_bp
 from routes.upload import upload_bp
 from utils.logger import configure_logger
+from routes.dev import dev_bp
 
 
 def create_app(config_class=Config):
@@ -30,6 +31,7 @@ def create_app(config_class=Config):
     app.register_blueprint(summary_bp)
     app.register_blueprint(history_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(dev_bp)
 
     @app.errorhandler(404)
     def not_found(error):

@@ -68,7 +68,7 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env
 ```
-
+ 
 Then edit `backend/.env` if you need to override values:
 
 ```text

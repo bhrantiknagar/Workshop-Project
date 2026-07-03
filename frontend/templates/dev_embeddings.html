@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Developer — Embeddings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include "components/navbar.html" %}
+    <main style="padding:20px;">
+        <h1>Developer — Embeddings</h1>
+        <p>Use this page to generate and inspect embeddings for uploaded PDFs.</p>
+
+        <form id="generateForm" method="post" action="{{ url_for('dev.generate_embeddings') }}">
+            <button type="submit">Generate embeddings for all PDFs</button>
+        </form>
+
+        <section style="margin-top:20px;">
+            {% if summaries %}
+                {% for s in summaries %}
+                    <div class="dev-card">
+                        <h3>{{ s.filename }}</h3>
+                        <ul>
+                            <li><strong>Chunks:</strong> {{ s.chunks }}</li>
+                            <li><strong>Embedding Size:</strong> {{ s.embedding_dim }}</li>
+                            <li><strong>Status:</strong> {{ s.status }}</li>
+                        </ul>
+                        <details>
+                            <summary>Sample chunks (first 5)</summary>
+                            <table>
+                                <thead>
+                                    <tr><th>Chunk ID</th><th>Preview</th><th>Embedding Length</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in s.samples %}
+                                        <tr>
+                                            <td>{{ c.chunk_id }}</td>
+                                            <td>{{ c.preview }}</td>
+                                            <td>{{ c.embedding_length }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </details>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No embeddings generated yet.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
