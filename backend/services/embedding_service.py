@@ -7,6 +7,8 @@ to any database — that will be implemented in a later phase.
 from pathlib import Path
 from typing import List, Dict, Any
 
+from services.vector_store import add_embeddings
+
 _MODEL_NAME = "all-MiniLM-L6-v2"
 EMBEDDINGS_STORE: Dict[str, List[Dict[str, Any]]] = {}
 _MODEL = None
@@ -93,12 +95,21 @@ def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str
 
     EMBEDDINGS_STORE[pdf_id] = chunks
 
+    if chunks:
+        try:
+            stored = add_embeddings(chunks)
+        except Exception as exc:
+            raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+    else:
+        stored = 0
+
     embedding_dim = len(chunks[0]["embedding"]) if chunks else 0
 
     return {
         "filename": filename,
         "pdf_id": pdf_id,
         "chunks_created": len(chunks),
+        "stored_embeddings": stored,
         "embedding_dim": embedding_dim,
         "status": "Generated" if chunks else "No chunks to embed",
     }

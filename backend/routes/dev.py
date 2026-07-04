@@ -1,6 +1,6 @@
 """Developer routes for inspecting embeddings and triggering generation."""
 
-from flask import Blueprint, current_app, render_template, request, jsonify
+from flask import Blueprint, current_app, render_template, jsonify
 
 from services.embedding_service import (
     generate_embeddings_for_all_pdfs,
@@ -17,6 +17,10 @@ def embeddings_dashboard():
     store = list_embeddings()
 
     summaries = []
+    from services.vector_store import get_collection_info
+
+    collection_info = get_collection_info()
+
     for pdf_id, chunks in store.items():
         embedding_dim = len(chunks[0]["embedding"]) if chunks else 0
         summaries.append(
@@ -37,7 +41,7 @@ def embeddings_dashboard():
             }
         )
 
-    return render_template("dev_embeddings.html", summaries=summaries)
+    return render_template("dev_embeddings.html", summaries=summaries, collection=collection_info)
 
 
 @dev_bp.post("/generate")

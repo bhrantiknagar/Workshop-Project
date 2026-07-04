@@ -17,6 +17,16 @@
         </form>
 
         <section style="margin-top:20px;">
+            <div class="dev-card">
+                <h2>ChromaDB status</h2>
+                <ul>
+                    <li><strong>Collection:</strong> {{ collection.collection_name }}</li>
+                    <li><strong>Documents:</strong> {{ collection.documents }}</li>
+                    <li><strong>Embeddings:</strong> {{ collection.embeddings }}</li>
+                    <li><strong>Status:</strong> {{ collection.status }}</li>
+                </ul>
+            </div>
+
             {% if summaries %}
                 {% for s in summaries %}
                     <div class="dev-card">
@@ -24,6 +34,7 @@
                         <ul>
                             <li><strong>Chunks:</strong> {{ s.chunks }}</li>
                             <li><strong>Embedding Size:</strong> {{ s.embedding_dim }}</li>
+                            <li><strong>Stored:</strong> {{ s.stored_embeddings }}</li>
                             <li><strong>Status:</strong> {{ s.status }}</li>
                         </ul>
                         <details>
