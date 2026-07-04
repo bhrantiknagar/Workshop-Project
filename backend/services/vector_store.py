@@ -203,7 +203,7 @@ def _convert_distance_to_score(distance: float) -> float:
         return 0.0
 
 
-def search_similar_chunks(question: str, top_k: int = 5) -> List[Dict[str, Any]]:
+def search_similar_chunks(question: str, top_k: int = 5, pdf_ids: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """Search the `smartpdf_documents` collection for chunks similar to `question`.
 
     Workflow:
@@ -241,6 +241,16 @@ def search_similar_chunks(question: str, top_k: int = 5) -> List[Dict[str, Any]]
         # If collection.count() not available or fails, continue and let query fail if needed
         pass
 
+    # Build optional `where` filter to restrict search to provided pdf_ids
+    where = None
+    if pdf_ids:
+        # Normalize to list of strings
+        pdf_ids = [str(x) for x in pdf_ids if x]
+        if pdf_ids:
+            # ChromaDB supports `$in` style filters in newer versions; use a
+            # conservative approach that works for single or multiple ids.
+            where = {"pdf_id": pdf_ids[0]} if len(pdf_ids) == 1 else {"pdf_id": {"$in": pdf_ids}}
+
     # Use query API if available
     query_fn = getattr(collection, "query", None)
     if not callable(query_fn):
@@ -249,19 +259,82 @@ def search_similar_chunks(question: str, top_k: int = 5) -> List[Dict[str, Any]]
     try:
         # Some ChromaDB versions reject unknown include items (e.g. 'ids'),
         # so only request the widely-supported fields here.
-        results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            include=["metadatas", "documents", "distances"],
-        )
+        query_kwargs = {
+            "query_embeddings": [query_embedding],
+            "n_results": top_k,
+            "include": ["metadatas", "documents", "distances"],
+        }
+        if where is not None:
+            query_kwargs["where"] = where
+
+        results = collection.query(**query_kwargs)
     except Exception as exc:
-        raise VectorStoreError(f"ChromaDB query failed: {exc}") from exc
+        # If filtering by multiple pdf_ids using a single `where` clause
+        # fails (older chromadb versions may not support `$in`), fall back
+        # to querying each pdf_id separately and merging the results.
+        if pdf_ids and len(pdf_ids) > 1:
+            try:
+                merged = []
+                for pid in pdf_ids:
+                    try:
+                        small_kwargs = {
+                            "query_embeddings": [query_embedding],
+                            "n_results": top_k,
+                            "include": ["metadatas", "documents", "distances"],
+                            "where": {"pdf_id": pid},
+                        }
+                        part = collection.query(**small_kwargs)
+                    except Exception:
+                        # Skip PDFs that cannot be queried individually
+                        continue
+
+                    docs = _flatten_list(part.get("documents", []))
+                    metas = _flatten_list(part.get("metadatas", []))
+                    dists = _flatten_list(part.get("distances", []))
+
+                    for d_idx, dist in enumerate(dists):
+                        merged.append((dist, docs[d_idx] if d_idx < len(docs) else "", metas[d_idx] if d_idx < len(metas) else {}))
+
+                # Sort merged results by ascending distance and take top_k
+                merged.sort(key=lambda t: t[0])
+                top = merged[:top_k]
+
+                results = {
+                    "documents": [t[1] for t in top],
+                    "metadatas": [t[2] for t in top],
+                    "distances": [t[0] for t in top],
+                }
+            except Exception as exc2:
+                raise VectorStoreError(f"ChromaDB query failed: {exc2}") from exc2
+        else:
+            raise VectorStoreError(f"ChromaDB query failed: {exc}") from exc
 
     # Results are typically nested lists (one list per query). Flatten to single lists.
     ids = _flatten_list(results.get("ids", []))
     docs = _flatten_list(results.get("documents", []))
     metadatas = _flatten_list(results.get("metadatas", []))
     distances = _flatten_list(results.get("distances", []))
+
+    # If a pdf_ids filter was provided, ensure results only include entries
+    # whose metadata `pdf_id` is in the allowed list. Some ChromaDB client
+    # versions ignore the `where` clause, so we defensively filter here.
+    if pdf_ids:
+        allowed = set(str(x) for x in pdf_ids if x)
+        filtered_docs = []
+        filtered_metas = []
+        filtered_dists = []
+        filtered_ids = []
+        for i, meta in enumerate(metadatas):
+            pid = None
+            if isinstance(meta, dict):
+                pid = meta.get("pdf_id")
+            if pid and str(pid) in allowed:
+                filtered_docs.append(docs[i] if i < len(docs) else "")
+                filtered_metas.append(meta)
+                filtered_dists.append(distances[i] if i < len(distances) else None)
+                filtered_ids.append(ids[i] if i < len(ids) else None)
+
+        docs, metadatas, distances, ids = filtered_docs, filtered_metas, filtered_dists, filtered_ids
 
     output: List[Dict[str, Any]] = []
     for idx, dist in enumerate(distances):

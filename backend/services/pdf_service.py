@@ -79,9 +79,16 @@ def _extract_pdf_data(pdf_path, filename, pdf_id):
 
 
 def save_pdf(file_storage, upload_folder, pdf_id="pdf_001"):
-    """Save an uploaded PDF, then extract metadata and page text."""
+    """Save an uploaded PDF, then extract metadata and page text.
+
+    The returned `id` will be the saved filename stem so it aligns with the
+    `pdf_id` used by the embedding generation flow which uses the filename
+    stem when scanning the upload folder.
+    """
     saved_path = save_uploaded_file(file_storage, Path(upload_folder))
-    return _extract_pdf_data(saved_path, saved_path.name, pdf_id)
+    # Use the saved file's stem (filename without extension) as the PDF id.
+    actual_pdf_id = Path(saved_path).stem
+    return _extract_pdf_data(saved_path, saved_path.name, actual_pdf_id)
 
 
 def save_pdfs(file_storages, upload_folder):

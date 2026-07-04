@@ -44,18 +44,17 @@
                 <button type="button">Create notes</button>
             </div>
 
-            <section class="llm-test-panel" aria-label="LLM test panel">
-                <h2>LLM Test</h2>
-                <p>Send a prompt to your local Ollama model to verify the connection.</p>
-                {% if config.DEBUG %}
-                    <p class="dev-model">Configured model: <strong>{{ config['MODEL_NAME'] }}</strong></p>
-                {% endif %}
-                <textarea id="llmPrompt" rows="4" placeholder="Type a prompt to test the local LLM connection..."></textarea>
-                <div class="llm-test-actions">
-                    <button id="llmGenerateButton" type="button">Generate</button>
-                    <span id="llmStatus" class="llm-status">Idle</span>
+            <section class="llm-test-panel" aria-label="PDF chat panel">
+                <h2>PDF Chat</h2>
+                <p>Ask a question about your uploaded PDFs. The answer will be produced using the uploaded PDF content only.</p>
+                <div>
+                    <label for="chatQuestion">Question</label>
+                    <input id="chatQuestion" name="question" type="text" style="width:60%;" placeholder="Ask about the uploaded PDFs..." />
+                    <button id="chatAskButton" type="button">Ask</button>
+                    <span id="chatStatus" class="llm-status">Idle</span>
                 </div>
-                <div id="llmResponse" class="llm-response" aria-live="polite">No response yet.</div>
+                <div id="chatAnswer" class="llm-response" aria-live="polite" style="margin-top:12px;">No answer yet.</div>
+                <div id="chatSources" style="margin-top:8px;"></div>
             </section>
 
         </section>
@@ -78,5 +77,67 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+    <script>
+    // Simple PDF Chat client — sends single-question RAG requests to /chat/ask
+    document.addEventListener('DOMContentLoaded', function () {
+        const askBtn = document.getElementById('chatAskButton');
+        const questionEl = document.getElementById('chatQuestion');
+        const statusEl = document.getElementById('chatStatus');
+        const answerEl = document.getElementById('chatAnswer');
+        const sourcesEl = document.getElementById('chatSources');
+
+        async function askQuestion() {
+            const q = (questionEl.value || '').trim();
+            if (!q) {
+                answerEl.textContent = 'Please enter a question.';
+                return;
+            }
+            statusEl.textContent = 'Loading...';
+            answerEl.textContent = '';
+            sourcesEl.innerHTML = '';
+
+                try {
+                // Include a list of currently uploaded PDF ids (if any) to limit retrieval
+                const uploaded = window.uploadedPdfs || [];
+                const pdf_ids = uploaded.map((f) => f.id);
+                const resp = await fetch('{{ url_for('chat.ask_question') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: q, pdf_ids }),
+                });
+                const data = await resp.json();
+                if (resp.ok) {
+                    answerEl.textContent = data.answer || 'No answer returned.';
+                    if (data.sources && Array.isArray(data.sources) && data.sources.length) {
+                        const list = document.createElement('ul');
+                        for (const s of data.sources) {
+                            const li = document.createElement('li');
+                            li.textContent = `${s.filename}${s.page ? ' — page ' + s.page : ''}`;
+                            list.appendChild(li);
+                        }
+                        sourcesEl.innerHTML = '<strong>Sources</strong>';
+                        sourcesEl.appendChild(list);
+                    } else {
+                        sourcesEl.textContent = '';
+                    }
+                } else {
+                    answerEl.textContent = data.answer || data.error || 'Error from server.';
+                }
+            } catch (err) {
+                answerEl.textContent = 'Network error while contacting the server.';
+            } finally {
+                statusEl.textContent = 'Idle';
+            }
+        }
+
+        askBtn.addEventListener('click', askQuestion);
+        questionEl.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                askQuestion();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

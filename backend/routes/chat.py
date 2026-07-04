@@ -2,7 +2,8 @@
 
 from flask import Blueprint, jsonify, request
 
-from services.llm_service import LLMServiceError, answer_question
+from services.llm_service import LLMServiceError
+from services.rag_service import answer_with_rag
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/chat")
 
@@ -12,13 +13,18 @@ def ask_question():
     """Return an answer for a user question."""
     payload = request.get_json(silent=True) or {}
     question = payload.get("question", "").strip()
+    pdf_ids = payload.get("pdf_ids") or None
 
     if not question:
         return jsonify({"answer": "Please enter a question."}), 400
 
     try:
-        answer = answer_question(question)
+        result = answer_with_rag(question, pdf_ids=pdf_ids)
     except LLMServiceError as exc:
         return jsonify({"answer": str(exc)}), exc.status_code
+    except Exception as exc:
+        # If retrieval failed, present a helpful message
+        return jsonify({"answer": str(exc)}), 500
 
-    return jsonify({"answer": answer})
+    # result contains `answer` and `sources`
+    return jsonify(result)

@@ -60,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const files = data.files || [];
         const totalPages = files.reduce((sum, file) => sum + file.total_pages, 0);
         uploadedPdfs = files;
+        // Expose uploaded PDFs to other frontend scripts (e.g., PDF Chat)
+        window.uploadedPdfs = uploadedPdfs;
 
         progress.style.width = "100%";
         progressLabel.textContent = "Ready";
@@ -243,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadedFileList.hidden = true;
         uploadedFileList.innerHTML = "";
         uploadedPdfs = [];
+        window.uploadedPdfs = uploadedPdfs;
         emptyState?.classList.remove("is-hidden");
 
         if (currentPdfName) {
