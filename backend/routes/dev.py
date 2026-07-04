@@ -8,6 +8,7 @@ from services.embedding_service import (
     EmbeddingError,
 )
 from services.vector_store import get_collection_info
+from services.vector_store import search_similar_chunks, VectorStoreError
 
 dev_bp = Blueprint("dev", __name__, url_prefix="/dev")
 
@@ -89,3 +90,30 @@ def generate_embeddings():
         collection=collection,
         message=message,
     )
+
+
+@dev_bp.get("/search")
+def search_page():
+    """Render a simple developer search UI for semantic retrieval."""
+    return render_template("dev_search.html")
+
+
+@dev_bp.post("/search")
+def run_search():
+    """Handle search requests from the developer UI and show top chunks."""
+    question = request.form.get("question", "").strip()
+    if not question:
+        return render_template("dev_search.html", error="Please enter a question.")
+
+    try:
+        results = search_similar_chunks(question, top_k=5)
+    except VectorStoreError as exc:
+        return render_template("dev_search.html", error=str(exc))
+    except Exception:
+        current_app.logger.exception("Unexpected error during search")
+        return render_template("dev_search.html", error="Unexpected search error.")
+
+    if not results:
+        return render_template("dev_search.html", question=question, results=[], message="No matching chunks found.")
+
+    return render_template("dev_search.html", question=question, results=results)

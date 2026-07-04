@@ -158,3 +158,134 @@ def get_collection_info() -> Dict[str, Any]:
         "embeddings": total_embeddings,
         "status": "Connected",
     }
+
+
+def _convert_distance_to_score(distance: float) -> float:
+    """Convert a ChromaDB distance to a percentage similarity score (0-100).
+
+    ChromaDB may return distances where 0.0 means identical (cosine distance).
+    We attempt a robust conversion: when distance is within [0,1], score = (1 - distance)*100.
+    Otherwise, if distance looks like a similarity already, clamp to [0,100].
+    """
+    # Robust conversion that handles different ChromaDB return conventions:
+    # - Some versions return a distance in [0, 2] (cosine distance where 0==identical, 2==opposite).
+    # - Others return a distance in [0, 1] where 0==identical (e.g., some L2-normalized distances).
+    # - Some clients may return a similarity in [0, 1] (higher == more similar).
+    #
+    # Heuristic used below:
+    # 1. If value in [0, 2]:
+    #    - If >1.0 we assume it is the cosine-distance in [0,2] and convert with (1 - d/2).
+    #    - If in [0,1]: we decide between "distance" vs "similarity" by thresholding at 0.5.
+    #      - If value >= 0.5 -> likely a similarity score (higher == more similar) so use val*100.
+    #      - Else treat as a distance (lower == more similar) so use (1 - val)*100.
+    # 2. If value outside expected ranges, clamp to [0,100].
+    try:
+        val = float(distance)
+        # Cosine distance in [0,2]
+        if 0.0 <= val <= 2.0:
+            if val > 1.0:
+                # Map [0,2] -> similarity percent: 0 -> 100%, 2 -> 0%
+                return round(max(0.0, (1.0 - (val / 2.0))) * 100.0, 2)
+
+            # val is in [0,1]. Could be distance (0==identical) or similarity (1==identical).
+            # Use a simple heuristic: values >= 0.5 are more likely to be similarity scores.
+            if val >= 0.5:
+                return round(val * 100.0, 2)
+            return round(max(0.0, (1.0 - val)) * 100.0, 2)
+
+        # If it's already on a 0-1 similarity scale
+        if 0.0 <= val <= 1.0:
+            return round(val * 100.0, 2)
+
+        # Otherwise clamp to 0-100
+        return round(max(0.0, min(val, 100.0)), 2)
+    except Exception:
+        return 0.0
+
+
+def search_similar_chunks(question: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    """Search the `smartpdf_documents` collection for chunks similar to `question`.
+
+    Workflow:
+    - Generate an embedding for `question` using the same embedding model.
+    - Query ChromaDB for the top_k nearest results.
+
+    Returns a list of results sorted by descending similarity score. Each result
+    contains: `filename`, `page`, `text`, `similarity`.
+
+    Raises:
+        VectorStoreError: on invalid input or ChromaDB errors.
+    """
+    if not isinstance(question, str) or not question.strip():
+        raise VectorStoreError("Question must be a non-empty string.")
+
+    try:
+        # Lazily import embedding helper to avoid circular imports at module import time
+        from services.embedding_service import embed_text
+    except Exception as exc:
+        raise VectorStoreError(f"Embedding service unavailable: {exc}") from exc
+
+    try:
+        query_embedding = embed_text(question)
+    except Exception as exc:
+        raise VectorStoreError(f"Failed to create query embedding: {exc}") from exc
+
+    client = _get_client()
+    collection = create_collection()
+
+    # Handle empty collection
+    try:
+        if collection.count() == 0:
+            return []
+    except Exception:
+        # If collection.count() not available or fails, continue and let query fail if needed
+        pass
+
+    # Use query API if available
+    query_fn = getattr(collection, "query", None)
+    if not callable(query_fn):
+        raise VectorStoreError("ChromaDB collection.query() not available in this client version.")
+
+    try:
+        # Some ChromaDB versions reject unknown include items (e.g. 'ids'),
+        # so only request the widely-supported fields here.
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=["metadatas", "documents", "distances"],
+        )
+    except Exception as exc:
+        raise VectorStoreError(f"ChromaDB query failed: {exc}") from exc
+
+    # Results are typically nested lists (one list per query). Flatten to single lists.
+    ids = _flatten_list(results.get("ids", []))
+    docs = _flatten_list(results.get("documents", []))
+    metadatas = _flatten_list(results.get("metadatas", []))
+    distances = _flatten_list(results.get("distances", []))
+
+    output: List[Dict[str, Any]] = []
+    for idx, dist in enumerate(distances):
+        try:
+            doc = docs[idx] if idx < len(docs) else ""
+            meta = metadatas[idx] if idx < len(metadatas) else {}
+            score = _convert_distance_to_score(dist)
+            # Determine whether the returned value is being shown as a similarity
+            # or a raw distance. If the conversion produced a percent > 0 then
+            # we present it as a similarity; otherwise show the raw distance.
+            display_type = "similarity" if score > 0 else "distance"
+            output.append(
+                {
+                    "filename": meta.get("filename") if isinstance(meta, dict) else None,
+                    "page": meta.get("page") if isinstance(meta, dict) else None,
+                    "text": doc,
+                    "raw_distance": dist,
+                    "similarity": score,
+                    "display_type": display_type,
+                }
+            )
+        except Exception:
+            continue
+
+    # Sort by descending similarity
+    output.sort(key=lambda r: r.get("similarity", 0.0), reverse=True)
+    return output

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Developer — Semantic Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include "components/navbar.html" %}
+    <main style="padding:20px;">
+        <h1>Developer — Semantic Search</h1>
+        <p>Enter a short question to retrieve the most relevant PDF chunks.</p>
+
+        <form id="searchForm" method="post" action="{{ url_for('dev.run_search') }}">
+            <label for="question">Question</label>
+            <input type="text" id="question" name="question" value="{{ question or '' }}" style="width:60%;" />
+            <button type="submit">Search</button>
+        </form>
+
+        <section style="margin-top:20px;">
+            {% if error %}
+                <div class="dev-card" style="border-color: #dc3545;">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+            {% endif %}
+            {% if message %}
+                <div class="dev-card" style="border-color: #6c757d;">
+                    {{ message }}
+                </div>
+            {% endif %}
+
+            {% if results %}
+                {% for r in results %}
+                    <div class="dev-card">
+                        <h3>Result {{ loop.index }}</h3>
+                        <ul>
+                            <li><strong>Filename:</strong> {{ r.filename or 'Unknown' }}</li>
+                            <li><strong>Page:</strong> {{ r.page or 'Unknown' }}</li>
+                            {% if r.display_type == 'similarity' %}
+                                <li><strong>Similarity:</strong> {{ r.similarity }}%</li>
+                            {% else %}
+                                <li><strong>Distance:</strong> {{ r.raw_distance }}</li>
+                            {% endif %}
+                        </ul>
+                        <pre style="white-space:pre-wrap;">{{ r.text }}</pre>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No results yet. Try a question like: "What are decorators?"</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

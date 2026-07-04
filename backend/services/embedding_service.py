@@ -49,6 +49,25 @@ def _to_list(vector) -> List[float]:
         return [float(v) for v in vector]
 
 
+def embed_text(text: str) -> List[float]:
+    """Generate an embedding for a single piece of text.
+
+    Uses the same SentenceTransformer model as the PDF embedding flow.
+
+    Raises:
+        EmbeddingError: if the input is invalid or embedding generation fails.
+    """
+    if not isinstance(text, str) or not text.strip():
+        raise EmbeddingError("Text to embed must be a non-empty string.")
+
+    model = _load_model()
+    try:
+        vector = model.encode(text)
+        return _to_list(vector)
+    except Exception as exc:  # pragma: no cover - runtime encoding errors
+        raise EmbeddingError(f"Failed to generate embedding for text: {exc}") from exc
+
+
 def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str, Any]]):
     """Generate embeddings for each text chunk (page) in a PDF.
 
