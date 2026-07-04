@@ -1,12 +1,13 @@
 """Developer routes for inspecting embeddings and triggering generation."""
 
-from flask import Blueprint, current_app, render_template, jsonify
+from flask import Blueprint, current_app, render_template, request, jsonify
 
 from services.embedding_service import (
     generate_embeddings_for_all_pdfs,
     list_embeddings,
     EmbeddingError,
 )
+from services.vector_store import get_collection_info
 
 dev_bp = Blueprint("dev", __name__, url_prefix="/dev")
 
@@ -67,4 +68,24 @@ def generate_embeddings():
             500,
         )
 
-    return jsonify({"success": True, "summaries": summaries}), 200
+    total_stored = sum(item.get("stored_embeddings", 0) for item in summaries)
+    message = f"Successfully stored {total_stored} embeddings in ChromaDB."
+    if request.is_json:
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": message,
+                    "summaries": summaries,
+                }
+            ),
+            200,
+        )
+
+    collection = get_collection_info()
+    return render_template(
+        "dev_embeddings.html",
+        summaries=summaries,
+        collection=collection,
+        message=message,
+    )

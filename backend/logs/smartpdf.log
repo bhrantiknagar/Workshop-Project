@@ -8,3 +8,132 @@ Traceback (most recent call last):
     with fitz.open(pdf_path) as document:
          ^^^^^^^^^
 AttributeError: module 'fitz' has no attribute 'open'
+2026-07-05 01:25:23,516 ERROR: Embedding generation failed
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 100, in generate_embeddings_for_pdf
+    stored = add_embeddings(chunks)
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 87, in add_embeddings
+    delete_pdf_embeddings(pdf_id)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 117, in delete_pdf_embeddings
+    existing = collection.get(where={"pdf_id": pdf_id}, include=["ids"])
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\Collection.py", line 154, in get
+    get_request = self._validate_and_prepare_get_request(
+        ids=ids,
+    ...<2 lines>...
+        include=include,
+    )
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 103, in wrapper
+    return func(self, *args, **kwargs)
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 274, in _validate_and_prepare_get_request
+    validate_include(include=include, dissalowed=["distances"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\types.py", line 1341, in validate_include
+    raise ValueError(
+        f"Expected include item to be one of {', '.join(valid_items)}, got {item}"
+    )
+ValueError: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\routes\dev.py", line 59, in generate_embeddings
+    summaries = generate_embeddings_for_all_pdfs(upload_folder)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 133, in generate_embeddings_for_all_pdfs
+    summary = generate_embeddings_for_pdf(pdf_id, filename, pages)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 102, in generate_embeddings_for_pdf
+    raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+services.embedding_service.EmbeddingError: Failed to persist embeddings for PDF 2nd_sem_Open_source_Technology: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+2026-07-05 01:25:43,514 ERROR: Embedding generation failed
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 100, in generate_embeddings_for_pdf
+    stored = add_embeddings(chunks)
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 87, in add_embeddings
+    delete_pdf_embeddings(pdf_id)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 117, in delete_pdf_embeddings
+    existing = collection.get(where={"pdf_id": pdf_id}, include=["ids"])
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\Collection.py", line 154, in get
+    get_request = self._validate_and_prepare_get_request(
+        ids=ids,
+    ...<2 lines>...
+        include=include,
+    )
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 103, in wrapper
+    return func(self, *args, **kwargs)
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 274, in _validate_and_prepare_get_request
+    validate_include(include=include, dissalowed=["distances"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\types.py", line 1341, in validate_include
+    raise ValueError(
+        f"Expected include item to be one of {', '.join(valid_items)}, got {item}"
+    )
+ValueError: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\routes\dev.py", line 59, in generate_embeddings
+    summaries = generate_embeddings_for_all_pdfs(upload_folder)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 133, in generate_embeddings_for_all_pdfs
+    summary = generate_embeddings_for_pdf(pdf_id, filename, pages)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 102, in generate_embeddings_for_pdf
+    raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+services.embedding_service.EmbeddingError: Failed to persist embeddings for PDF 2nd_sem_Open_source_Technology: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+2026-07-05 01:26:04,257 ERROR: Embedding generation failed
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 100, in generate_embeddings_for_pdf
+    stored = add_embeddings(chunks)
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 87, in add_embeddings
+    delete_pdf_embeddings(pdf_id)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 117, in delete_pdf_embeddings
+    existing = collection.get(where={"pdf_id": pdf_id}, include=["ids"])
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\Collection.py", line 154, in get
+    get_request = self._validate_and_prepare_get_request(
+        ids=ids,
+    ...<2 lines>...
+        include=include,
+    )
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 103, in wrapper
+    return func(self, *args, **kwargs)
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\models\CollectionCommon.py", line 274, in _validate_and_prepare_get_request
+    validate_include(include=include, dissalowed=["distances"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workshop_Project\backend\.venv\Lib\site-packages\chromadb\api\types.py", line 1341, in validate_include
+    raise ValueError(
+        f"Expected include item to be one of {', '.join(valid_items)}, got {item}"
+    )
+ValueError: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\routes\dev.py", line 59, in generate_embeddings
+    summaries = generate_embeddings_for_all_pdfs(upload_folder)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 133, in generate_embeddings_for_all_pdfs
+    summary = generate_embeddings_for_pdf(pdf_id, filename, pages)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 102, in generate_embeddings_for_pdf
+    raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+services.embedding_service.EmbeddingError: Failed to persist embeddings for PDF 2nd_sem_Open_source_Technology: Expected include item to be one of documents, embeddings, metadatas, distances, uris, data, got ids in get.
+2026-07-05 02:25:06,512 ERROR: Embedding generation failed
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 100, in generate_embeddings_for_pdf
+    result = add_embeddings(chunks)
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 87, in add_embeddings
+    deleted = delete_pdf_embeddings(pdf_id)
+  File "D:\Workshop_Project\backend\services\vector_store.py", line 118, in delete_pdf_embeddings
+    _get_client().persist()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Client' object has no attribute 'persist'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Workshop_Project\backend\routes\dev.py", line 60, in generate_embeddings
+    summaries = generate_embeddings_for_all_pdfs(upload_folder)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 137, in generate_embeddings_for_all_pdfs
+    summary = generate_embeddings_for_pdf(pdf_id, filename, pages)
+  File "D:\Workshop_Project\backend\services\embedding_service.py", line 102, in generate_embeddings_for_pdf
+    raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+services.embedding_service.EmbeddingError: Failed to persist embeddings for PDF 2nd_sem_Open_source_Technology: 'Client' object has no attribute 'persist'

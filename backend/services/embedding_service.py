@@ -97,11 +97,14 @@ def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str
 
     if chunks:
         try:
-            stored = add_embeddings(chunks)
+            result = add_embeddings(chunks)
         except Exception as exc:
             raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
+        stored = result.get("stored", 0)
+        deleted = result.get("deleted", 0)
     else:
         stored = 0
+        deleted = 0
 
     embedding_dim = len(chunks[0]["embedding"]) if chunks else 0
 
@@ -110,6 +113,7 @@ def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str
         "pdf_id": pdf_id,
         "chunks_created": len(chunks),
         "stored_embeddings": stored,
+        "deleted_embeddings": deleted,
         "embedding_dim": embedding_dim,
         "status": "Generated" if chunks else "No chunks to embed",
     }

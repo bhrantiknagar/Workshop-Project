@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import chromadb
-from chromadb.config import Settings
 
 from config import Config
 
@@ -14,15 +13,28 @@ class VectorStoreError(Exception):
     """Raised when ChromaDB operations fail."""
 
 
-def _get_client() -> chromadb.Client:
+def _get_client():
     """Create or return a persistent ChromaDB client."""
     db_path = Path(Config.CHROMA_DB_PATH)
     db_path.mkdir(parents=True, exist_ok=True)
-    settings = Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=str(db_path),
-    )
-    return chromadb.Client(settings)
+    return chromadb.PersistentClient(path=str(db_path))
+
+
+def _maybe_persist(client) -> bool:
+    """Attempt to persist the ChromaDB client if the method exists.
+
+    Returns True if a persist operation was attempted, False otherwise.
+    """
+    try:
+        persist_fn = getattr(client, "persist", None)
+        if callable(persist_fn):
+            persist_fn()
+            return True
+    except Exception:
+        # If persistence fails for any reason, don't crash the app here.
+        return False
+
+    return False
 
 
 def create_collection(name: Optional[str] = None):
@@ -71,11 +83,11 @@ def _flatten_list(value: Any) -> List[Any]:
     return [value]
 
 
-def add_embeddings(chunks: List[Dict[str, Any]]) -> int:
+def add_embeddings(chunks: List[Dict[str, Any]]) -> Dict[str, int]:
     """Add embeddings to the smartpdf_documents collection.
 
     Duplicate chunk IDs are removed before insertion.
-    Returns the number of embeddings stored.
+    Returns the number of embeddings deleted and stored.
     """
     if not isinstance(chunks, list) or not chunks:
         raise VectorStoreError("No chunk embeddings provided.")
@@ -89,7 +101,7 @@ def add_embeddings(chunks: List[Dict[str, Any]]) -> int:
     for chunk in chunks:
         _validate_chunk(chunk)
 
-    delete_pdf_embeddings(pdf_id)
+    deleted = delete_pdf_embeddings(pdf_id)
 
     ids = [chunk["chunk_id"] for chunk in chunks]
     documents = [chunk["text"] for chunk in chunks]
@@ -109,8 +121,11 @@ def add_embeddings(chunks: List[Dict[str, Any]]) -> int:
         metadatas=metadatas,
         embeddings=embeddings,
     )
-    client.persist()
-    return len(ids)
+    # Some chromadb client versions expose a `persist()` method on the
+    # client; others persist automatically or expose different APIs.
+    # Call persist if available, but don't raise if it's not present.
+    _maybe_persist(client)
+    return {"deleted": deleted, "stored": len(ids)}
 
 
 def delete_pdf_embeddings(pdf_id: str) -> int:
@@ -119,14 +134,15 @@ def delete_pdf_embeddings(pdf_id: str) -> int:
         raise VectorStoreError("pdf_id must be a non-empty string.")
 
     collection = create_collection()
-    existing = collection.get(where={"pdf_id": pdf_id}, include=["ids"])
-    ids = _flatten_list(existing.get("ids", []))
-    if not ids:
-        return 0
+    delete_result = collection.delete(where={"pdf_id": pdf_id})
+    # Attempt to persist client state if supported by the installed chromadb.
+    try:
+        _maybe_persist(_get_client())
+    except Exception:
+        pass
 
-    collection.delete(ids=ids)
-    _get_client().persist()
-    return len(ids)
+    # ChromaDB DeleteResult may include a count of removed ids.
+    return len(delete_result.ids) if hasattr(delete_result, "ids") else 0
 
 
 def get_collection_info() -> Dict[str, Any]:
