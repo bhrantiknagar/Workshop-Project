@@ -96,8 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (selectedFiles.length > 3) {
-            window.showToast("Upload up to 3 PDF files only.");
+        if (selectedFiles.length > 2) {
+            window.showToast("Upload up to 2 PDF files only.");
             return;
         }
 

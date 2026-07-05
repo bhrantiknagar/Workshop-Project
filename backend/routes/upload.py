@@ -22,11 +22,11 @@ def upload_pdf():
 
     files = [file for file in files if file.filename]
 
-    if len(files) > 3:
+    if len(files) > 2:
         return jsonify(
             {
                 "success": False,
-                "message": "Upload up to 3 PDF files only.",
+                "message": "Upload up to 2 PDF files only.",
             }
         ), 400
 
