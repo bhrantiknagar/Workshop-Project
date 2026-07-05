@@ -59,7 +59,8 @@ Make sure you have the following installed:
 
 ## Install Dependencies
 
-Open PowerShell and run:
+Open PowerShell (or Terminal) and run:
+
 
 ```powershell
 cd D:\Workshop_Project\backend

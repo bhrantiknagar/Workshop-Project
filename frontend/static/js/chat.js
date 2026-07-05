@@ -1,3 +1,236 @@
+/* chat.js - modular frontend for PDF Chat UI
+   - Stores chat history in sessionStorage
+   - Sends single-question RAG requests to server (/chat/ask)
+   - Shows loading animation, timestamps, copy and clear features
+*/
+(function () {
+  const STORAGE_KEY = 'pdfChatHistory';
+
+  function fmtTime(ts) {
+    const d = new Date(ts);
+    let hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
+  }
+
+  function loadHistory() {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveHistory(messages) {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }
+
+  function createMessageNode(msg) {
+    // Build a message node that matches the chat CSS structure
+    const el = document.createElement('div');
+    const isUser = msg.role === 'user';
+    el.className = 'message ' + (isUser ? 'user-message' : 'ai-message');
+
+    // avatar
+    const avatar = document.createElement('span');
+    avatar.className = 'avatar';
+    avatar.innerHTML = isUser ? 'You' : '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+    el.appendChild(avatar);
+
+    // message content container
+    const contentWrap = document.createElement('div');
+    contentWrap.className = 'message-content';
+
+    const p = document.createElement('p');
+    p.textContent = msg.text;
+    contentWrap.appendChild(p);
+
+    // actions (copy, page badge, time)
+    const actions = document.createElement('div');
+    actions.className = 'message-actions';
+
+    if (!isUser) {
+      const copy = document.createElement('button');
+      copy.className = 'copy-button';
+      copy.title = 'Copy answer';
+      copy.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+      copy.addEventListener('click', function () {
+        navigator.clipboard.writeText(msg.text).then(() => {
+          const old = copy.innerHTML;
+          copy.textContent = 'Copied';
+          setTimeout(() => (copy.innerHTML = old), 1200);
+        });
+      });
+      actions.appendChild(copy);
+    }
+
+    // timestamp
+    const time = document.createElement('span');
+    time.className = 'message-time';
+    time.textContent = fmtTime(msg.ts || Date.now());
+    actions.appendChild(time);
+
+    contentWrap.appendChild(actions);
+
+    // sources (if any)
+    if (!isUser && Array.isArray(msg.sources) && msg.sources.length) {
+      const src = document.createElement('div');
+      src.className = 'source-list';
+      const title = document.createElement('strong');
+      title.textContent = 'Sources';
+      src.appendChild(title);
+      const ul = document.createElement('ul');
+      msg.sources.forEach((s) => {
+        const li = document.createElement('li');
+        li.textContent = `${s.filename || s.pdf_id}${s.page ? ' — page ' + s.page : ''}`;
+        ul.appendChild(li);
+      });
+      src.appendChild(ul);
+      contentWrap.appendChild(src);
+    }
+
+    el.appendChild(contentWrap);
+    return el;
+  }
+
+  function renderMessages(container, messages) {
+    container.innerHTML = '';
+    messages.forEach((m) => container.appendChild(createMessageNode(m)));
+    // scroll to newest
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function makeLoadingMessage(text) {
+    return { role: 'assistant', text: text, ts: Date.now(), loading: true };
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const chatPanel = document.querySelector('.llm-test-panel');
+    if (!chatPanel) return;
+
+    // Replace panel content with chat UI
+    chatPanel.classList.add('pdf-chat-panel');
+    chatPanel.innerHTML = `
+      <div class="pdf-chat-header">
+        <div class="pdf-chat-title">PDF Chat</div>
+        <div class="controls">
+          <button class="small-btn" id="chatClear">Clear Chat</button>
+        </div>
+      </div>
+      <div class="pdf-chat-body">
+        <div class="chat-window">
+          <div class="messages" id="chatMessages" aria-live="polite"></div>
+          <div class="chat-input">
+            <textarea id="chatInput" placeholder="Ask about the uploaded PDFs... (Shift+Enter = newline)"></textarea>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button id="chatSend">Ask</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('chatSend');
+    const clearBtn = document.getElementById('chatClear');
+
+    let messages = loadHistory();
+    renderMessages(messagesEl, messages);
+
+    function appendAndSave(msg) {
+      messages.push(msg);
+      saveHistory(messages);
+      renderMessages(messagesEl, messages);
+    }
+
+    async function sendQuestion() {
+      const q = (inputEl.value || '').trim();
+      if (!q) return;
+      inputEl.value = '';
+      const userMsg = { role: 'user', text: q, ts: Date.now() };
+      appendAndSave(userMsg);
+
+      // Loading placeholder
+      const stages = ['Searching PDFs...', 'Retrieving relevant pages...', 'Generating answer...'];
+      let stageIndex = 0;
+      const loadingMsg = makeLoadingMessage(stages[stageIndex]);
+      appendAndSave(loadingMsg);
+
+      const interval = setInterval(() => {
+        stageIndex = Math.min(stageIndex + 1, stages.length - 1);
+        // update last message text
+        messages[messages.length - 1].text = stages[stageIndex];
+        saveHistory(messages);
+        renderMessages(messagesEl, messages);
+      }, 1200);
+
+      // Build request
+      const uploaded = window.uploadedPdfs || [];
+      const pdf_ids = uploaded.map((f) => f.id);
+      const askUrl = (window.pdfChatConfig && window.pdfChatConfig.askUrl) ? window.pdfChatConfig.askUrl : '/chat/ask';
+
+      try {
+        const resp = await fetch(askUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q, pdf_ids }),
+        });
+        const data = await resp.json();
+        clearInterval(interval);
+        // remove loading message
+        messages.pop();
+        if (resp.ok) {
+          const aiMsg = { role: 'assistant', text: data.answer || 'No answer returned.', ts: Date.now(), sources: data.sources || [] };
+          appendAndSave(aiMsg);
+        } else {
+          const errMsg = { role: 'assistant', text: data.answer || data.error || 'Error from server.', ts: Date.now() };
+          appendAndSave(errMsg);
+        }
+      } catch (err) {
+        clearInterval(interval);
+        messages.pop();
+        appendAndSave({ role: 'assistant', text: 'Network error while contacting the server.', ts: Date.now() });
+      }
+    }
+
+    sendBtn.addEventListener('click', sendQuestion);
+
+    // Wire example action buttons (e.g., "Summarize these PDFs") so clicking
+    // them populates the input and immediately sends the question.
+    const exampleBtns = document.querySelectorAll('.prompt-examples button');
+    if (exampleBtns && exampleBtns.length) {
+      exampleBtns.forEach((b) => {
+        b.addEventListener('click', function () {
+          const text = (this.textContent || '').trim();
+          if (!text) return;
+          inputEl.value = text;
+          // small delay so UI updates before sending
+          setTimeout(() => {
+            sendQuestion();
+          }, 50);
+        });
+      });
+    }
+
+    inputEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendQuestion();
+      }
+    });
+
+    clearBtn.addEventListener('click', function () {
+      if (!confirm('Clear chat history for this session?')) return;
+      messages = [];
+      saveHistory(messages);
+      renderMessages(messagesEl, messages);
+    });
+  });
+})();
 // Creates a frontend-only AI chat preview with typing, copy, and history.
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("#chatForm");
