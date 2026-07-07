@@ -165,7 +165,6 @@ This setup allows you to show clean architecture and future extension points for
 
 - connect uploaded PDF content to the LLM prompt flow
 - implement retrieval-augmented generation (RAG)
-- add persistent chat history
+- add persistent chat history               
 - add more test coverage under `backend/tests/`
 - add production deployment instructions with a WSGI server
- 
