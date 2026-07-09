@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadedPdfs = files;
         // Expose uploaded PDFs to other frontend scripts (e.g., PDF Chat)
         window.uploadedPdfs = uploadedPdfs;
+        document.dispatchEvent(new CustomEvent("pdfUploadsChanged"));
 
         progress.style.width = "100%";
         progressLabel.textContent = "Ready";
@@ -394,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadedFileList.innerHTML = "";
         uploadedPdfs = [];
         window.uploadedPdfs = uploadedPdfs;
+        document.dispatchEvent(new CustomEvent("pdfUploadsChanged"));
         emptyState?.classList.remove("is-hidden");
 
         if (currentPdfName) {

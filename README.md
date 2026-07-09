@@ -11,6 +11,7 @@ This project is designed as an educational prototype for a PDF AI assistant. It 
 - a temporary LLM test panel for verifying Ollama connectivity
 - a PDF chat model selector for Groq Cloud or Ollama Local
 - AI comparison between two uploaded PDFs
+- Quick AI Actions for summaries, notes, key points, quizzes, and flashcards
 - clean separation between backend and frontend resources
 - error handling for Ollama availability, missing models, empty prompts, and timeouts
 
@@ -130,6 +131,7 @@ curl.exe http://localhost:11434/api/tags
 4. Preview extracted PDF text
 5. Use PDF Chat and choose `Groq Cloud` or `Ollama Local` from the AI Model selector
 6. Upload exactly two PDFs and click `Compare PDFs` to compare a specific topic across both documents
+7. Use `Quick AI Actions` below uploaded PDFs to generate summaries, study notes, key points, quizzes, or flashcards
 
 ## Tech Stack
 

@@ -1543,3 +1543,17 @@ body.light-theme {
     margin: 0;
     white-space: pre-wrap;
 }
+
+.mini-footer {
+    align-items: center;
+    border-top: 1px solid #e5e7eb;
+    color: #64748b;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 13px;
+    gap: 8px 14px;
+    justify-content: center;
+    margin: 16px auto 0;
+    max-width: 1040px;
+    padding: 18px 16px 26px;
+}

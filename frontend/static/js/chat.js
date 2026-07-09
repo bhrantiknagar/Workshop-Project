@@ -73,6 +73,10 @@
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
   }
 
+  function getUploadedPdfs() {
+    return Array.isArray(window.uploadedPdfs) ? window.uploadedPdfs : [];
+  }
+
   function appendInlineFormattedText(parent, text) {
     const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g);
     parts.forEach((part) => {
@@ -182,7 +186,13 @@
       const row = document.createElement('div');
       row.className = 'page-reference-row';
       const sortedPages = Array.from(pages).sort((a, b) => Number(a) - Number(b));
-      row.textContent = `${filename}: ${sortedPages.map((page) => `Page ${page}`).join(', ')}`;
+      const file = document.createElement('span');
+      file.className = 'page-reference-file';
+      file.textContent = filename;
+      const pageList = document.createElement('span');
+      pageList.textContent = `Pages: ${sortedPages.join(', ')}`;
+      row.appendChild(file);
+      row.appendChild(pageList);
       refs.appendChild(row);
     });
 
@@ -254,6 +264,9 @@
     const el = document.createElement('div');
     const isUser = msg.role === 'user';
     el.className = 'message ' + (isUser ? 'user-message' : 'ai-message');
+    if (msg.loading) {
+      el.classList.add('loading-message');
+    }
 
     // avatar
     const avatar = document.createElement('span');
@@ -280,6 +293,12 @@
       const answer = document.createElement('div');
       answer.className = 'answer-content';
       appendFormattedAnswer(answer, msg.text);
+      if (msg.loading) {
+        const dots = document.createElement('span');
+        dots.className = 'typing mini-typing';
+        dots.innerHTML = '<span></span><span></span><span></span>';
+        answer.appendChild(dots);
+      }
       contentWrap.appendChild(answer);
       appendPageReferences(contentWrap, msg.sources);
     }
@@ -319,6 +338,18 @@
 
   function renderMessages(container, messages) {
     container.innerHTML = '';
+    if (!messages.length) {
+      const welcome = document.createElement('div');
+      welcome.className = 'chat-welcome';
+      welcome.innerHTML = `
+        <i class="fa-regular fa-comments"></i>
+        <h3>Welcome to SmartPDF AI</h3>
+        <p>Upload your PDFs and start asking questions.</p>
+      `;
+      container.appendChild(welcome);
+      return;
+    }
+
     messages.forEach((m) => container.appendChild(createMessageNode(m)));
     // scroll to newest
     container.scrollTop = container.scrollHeight;
@@ -346,6 +377,8 @@
         <div class="chat-window">
           <div class="chat-layout">
             <div class="chat-main">
+              <div class="active-documents" id="activeDocuments" hidden></div>
+              <div class="suggested-questions" id="suggestedQuestions" hidden></div>
               <div class="messages" id="chatMessages" aria-live="polite"></div>
               <label class="model-selector" for="aiModelSelect">
                 <span>AI Model</span>
@@ -380,6 +413,8 @@
 
 
     const messagesEl = document.getElementById('chatMessages');
+    const activeDocumentsEl = document.getElementById('activeDocuments');
+    const suggestedQuestionsEl = document.getElementById('suggestedQuestions');
     const inputEl = document.getElementById('chatInput');
     const modelSelect = document.getElementById('aiModelSelect');
     const sendBtn = document.getElementById('chatSend');
@@ -388,6 +423,73 @@
     let messages = loadHistory();
     renderMessages(messagesEl, messages);
     buildHistorySidebar(messages);
+
+    function renderActiveDocuments(files) {
+      if (!activeDocumentsEl) return;
+      activeDocumentsEl.innerHTML = '';
+      if (!files.length) {
+        activeDocumentsEl.hidden = true;
+        return;
+      }
+
+      const title = document.createElement('span');
+      title.className = 'active-documents-title';
+      title.textContent = 'Active documents';
+      activeDocumentsEl.appendChild(title);
+
+      files.forEach((file) => {
+        const item = document.createElement('span');
+        item.className = 'active-document-pill';
+        item.innerHTML = '<i class="fa-regular fa-file-pdf"></i>';
+        item.appendChild(document.createTextNode(file.filename || 'PDF'));
+        activeDocumentsEl.appendChild(item);
+      });
+      activeDocumentsEl.hidden = false;
+    }
+
+    function renderSuggestedQuestions(files) {
+      if (!suggestedQuestionsEl) return;
+      suggestedQuestionsEl.innerHTML = '';
+      if (!files.length) {
+        suggestedQuestionsEl.hidden = true;
+        return;
+      }
+
+      const suggestions = [
+        'Summarize this document',
+        'Explain the main topic',
+        'Create study notes',
+        'What are the important concepts?',
+      ];
+      if (files.length === 2) {
+        suggestions.push('Compare both PDFs');
+      }
+
+      const title = document.createElement('span');
+      title.className = 'suggested-questions-title';
+      title.textContent = 'Suggested questions';
+      suggestedQuestionsEl.appendChild(title);
+
+      const list = document.createElement('div');
+      list.className = 'suggested-questions-list';
+      suggestions.forEach((text) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = text;
+        button.dataset.suggestedQuestion = text;
+        list.appendChild(button);
+      });
+      suggestedQuestionsEl.appendChild(list);
+      suggestedQuestionsEl.hidden = false;
+    }
+
+    function syncUploadedPdfUi() {
+      const files = getUploadedPdfs();
+      renderActiveDocuments(files);
+      renderSuggestedQuestions(files);
+    }
+
+    syncUploadedPdfUi();
 
     const historyToggleBtn = document.getElementById('chatHistoryToggle');
     const historySidebar = document.getElementById('chatHistorySidebar');
@@ -416,15 +518,16 @@
     }
 
 
-    async function sendQuestion() {
-      const q = (inputEl.value || '').trim();
+    async function sendQuestion(questionOverride) {
+      const overrideText = typeof questionOverride === 'string' ? questionOverride : '';
+      const q = (overrideText || inputEl.value || '').trim();
       if (!q) return;
       inputEl.value = '';
       const userMsg = { role: 'user', text: q, ts: Date.now() };
       appendAndSave(userMsg);
 
       // Loading placeholder
-      const stages = ['Searching PDFs...', 'Retrieving relevant pages...', 'Generating answer...'];
+      const stages = ['Searching documents...', 'Finding relevant pages...', 'Generating answer...'];
       let stageIndex = 0;
       const loadingMsg = makeLoadingMessage(stages[stageIndex]);
       appendAndSave(loadingMsg);
@@ -438,7 +541,7 @@
       }, 1200);
 
       // Build request
-      const uploaded = window.uploadedPdfs || [];
+      const uploaded = getUploadedPdfs();
       const pdf_ids = uploaded.map((f) => f.id);
       const provider = modelSelect?.value || 'groq';
       const askUrl = (window.pdfChatConfig && window.pdfChatConfig.askUrl) ? window.pdfChatConfig.askUrl : '/chat/ask';
@@ -489,6 +592,12 @@
 
     sendBtn.addEventListener('click', sendQuestion);
 
+    suggestedQuestionsEl?.addEventListener('click', function (event) {
+      const button = event.target.closest('[data-suggested-question]');
+      if (!button) return;
+      sendQuestion(button.dataset.suggestedQuestion || button.textContent || '');
+    });
+
     // Wire example action buttons (e.g., "Summarize these PDFs") so clicking
     // them populates the input and immediately sends the question.
     const exampleBtns = document.querySelectorAll('.prompt-examples button');
@@ -537,6 +646,8 @@
         sources: detail.sources || [],
       });
     });
+
+    document.addEventListener('pdfUploadsChanged', syncUploadedPdfUi);
 
   });
 })();
