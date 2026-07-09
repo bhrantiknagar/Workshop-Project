@@ -91,7 +91,31 @@
 
     const p = document.createElement('p');
     p.textContent = msg.text;
+    if (!isUser && msg.providerLabel) {
+      const modelMeta = document.createElement('div');
+      modelMeta.className = 'model-meta';
+      modelMeta.textContent = `Using: ${msg.providerLabel}`;
+      contentWrap.appendChild(modelMeta);
+    }
     contentWrap.appendChild(p);
+
+    if (!isUser && Array.isArray(msg.sources) && msg.sources.length) {
+      const sourceList = document.createElement('div');
+      sourceList.className = 'source-list';
+      const title = document.createElement('strong');
+      title.textContent = 'Sources';
+      const list = document.createElement('ul');
+      msg.sources.forEach((source) => {
+        const item = document.createElement('li');
+        const filename = source.filename || 'unknown.pdf';
+        const page = source.page || '?';
+        item.textContent = `${filename} - page ${page}`;
+        list.appendChild(item);
+      });
+      sourceList.appendChild(title);
+      sourceList.appendChild(list);
+      contentWrap.appendChild(sourceList);
+    }
 
     // actions (copy, page badge, time)
     const actions = document.createElement('div');
@@ -156,16 +180,21 @@
           <div class="chat-layout">
             <div class="chat-main">
               <div class="messages" id="chatMessages" aria-live="polite"></div>
+              <label class="model-selector" for="aiModelSelect">
+                <span>AI Model</span>
+                <select id="aiModelSelect">
+                  <option value="groq" selected>Groq Cloud</option>
+                  <option value="ollama">Ollama Local</option>
+                </select>
+              </label>
               <div class="chat-input">
                 <textarea id="chatInput" placeholder="Ask about the uploaded PDFs... (Shift+Enter = newline)"></textarea>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <button id="chatSend">Ask</button>
-                </div>
+                <button id="chatSend" type="button">Ask</button>
               </div>
             </div>
 
             <div class="chat-history-trigger-wrap">
-              <button class="small-btn" id="chatHistoryToggle" type="button">History</button>
+              <button class="small-btn" id="chatHistoryToggle" type="button" aria-expanded="false">History</button>
             </div>
 
             <aside class="chat-history-sidebar" aria-label="Chat history" id="chatHistorySidebar" hidden>
@@ -185,6 +214,7 @@
 
     const messagesEl = document.getElementById('chatMessages');
     const inputEl = document.getElementById('chatInput');
+    const modelSelect = document.getElementById('aiModelSelect');
     const sendBtn = document.getElementById('chatSend');
     const clearBtn = document.getElementById('chatClear');
 
@@ -194,13 +224,18 @@
 
     const historyToggleBtn = document.getElementById('chatHistoryToggle');
     const historySidebar = document.getElementById('chatHistorySidebar');
+    const chatLayout = document.querySelector('.chat-layout');
     historyToggleBtn?.addEventListener('click', () => {
       const willShow = historySidebar && historySidebar.hasAttribute('hidden');
       if (!historySidebar) return;
       if (willShow) {
         historySidebar.removeAttribute('hidden');
+        chatLayout?.classList.add('history-open');
+        historyToggleBtn.setAttribute('aria-expanded', 'true');
       } else {
         historySidebar.setAttribute('hidden', 'hidden');
+        chatLayout?.classList.remove('history-open');
+        historyToggleBtn.setAttribute('aria-expanded', 'false');
       }
     });
 
@@ -238,30 +273,50 @@
       // Build request
       const uploaded = window.uploadedPdfs || [];
       const pdf_ids = uploaded.map((f) => f.id);
+      const provider = modelSelect?.value || 'groq';
       const askUrl = (window.pdfChatConfig && window.pdfChatConfig.askUrl) ? window.pdfChatConfig.askUrl : '/chat/ask';
 
       try {
         const resp = await fetch(askUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: q, pdf_ids }),
+          body: JSON.stringify({ question: q, pdf_ids, provider }),
         });
         const data = await resp.json();
         clearInterval(interval);
         // remove loading message
         messages.pop();
         if (resp.ok) {
-          const aiMsg = { role: 'assistant', text: data.answer || 'No answer returned.', ts: Date.now() };
+          const aiMsg = {
+            role: 'assistant',
+            text: data.answer || 'No answer returned.',
+            ts: Date.now(),
+            provider: data.provider || provider,
+            providerLabel: data.provider_label || (provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud'),
+            sources: data.sources || [],
+          };
           appendAndSave(aiMsg);
 
         } else {
-          const errMsg = { role: 'assistant', text: data.answer || data.error || 'Error from server.', ts: Date.now() };
+          const errMsg = {
+            role: 'assistant',
+            text: data.answer || data.error || 'Error from server.',
+            ts: Date.now(),
+            provider,
+            providerLabel: provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud',
+          };
           appendAndSave(errMsg);
         }
       } catch (err) {
         clearInterval(interval);
         messages.pop();
-        appendAndSave({ role: 'assistant', text: 'Network error while contacting the server.', ts: Date.now() });
+        appendAndSave({
+          role: 'assistant',
+          text: 'Network error while contacting the server.',
+          ts: Date.now(),
+          provider,
+          providerLabel: provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud',
+        });
       }
     }
 

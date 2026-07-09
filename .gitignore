@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.example 
 logs/*.log
 static/uploads/*
 !static/uploads/.gitkeep

@@ -29,4 +29,7 @@ class Config:
     OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3:latest")
     MODEL_NAME = os.getenv("MODEL_NAME", OLLAMA_MODEL) or "llama3:latest"
     OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "180"))
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    GROQ_TIMEOUT = int(os.getenv("GROQ_TIMEOUT", "60"))
     ALLOWED_EXTENSIONS = {"pdf"}

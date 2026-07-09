@@ -9,6 +9,7 @@ This project is designed as an educational prototype for a PDF AI assistant. It 
 - uploading PDF files
 - previewing extracted text
 - a temporary LLM test panel for verifying Ollama connectivity
+- a PDF chat model selector for Groq Cloud or Ollama Local
 - clean separation between backend and frontend resources
 - error handling for Ollama availability, missing models, empty prompts, and timeouts
 
@@ -78,6 +79,9 @@ SECRET_KEY=replace-with-a-secure-secret
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3:latest
 OLLAMA_TIMEOUT=180
+GROQ_API_KEY=your-groq-api-key
+GROQ_MODEL=llama-3.1-8b-instant
+GROQ_TIMEOUT=60
 ```
 
 ## Start the Application from PowerShell
@@ -123,7 +127,7 @@ curl.exe http://localhost:11434/api/tags
 2. Open `http://localhost:5000`
 3. Upload a PDF using the homepage upload widget
 4. Preview extracted PDF text
-5. Use the `LLM Test` panel to send a prompt to your local Ollama model
+5. Use PDF Chat and choose `Groq Cloud` or `Ollama Local` from the AI Model selector
 
 ## Tech Stack
 

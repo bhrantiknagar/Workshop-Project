@@ -14,19 +14,24 @@ def ask_question():
     payload = request.get_json(silent=True) or {}
     question = payload.get("question", "").strip()
     pdf_ids = payload.get("pdf_ids") or None
+    provider = payload.get("provider") or "groq"
 
     if not question:
         return jsonify({"answer": "Please enter a question."}), 400
 
     try:
-        result = answer_with_rag(question, pdf_ids=pdf_ids)
+        result = answer_with_rag(question, pdf_ids=pdf_ids, provider=provider)
     except LLMServiceError as exc:
         return jsonify({"answer": str(exc)}), exc.status_code
     except Exception as exc:
         # If retrieval failed, present a helpful message
         return jsonify({"answer": str(exc)}), 500
 
-    # Hide sources in the API response for the frontend.
-    # Frontend can render the plain answer without citation/source lists.
-    return jsonify({"answer": result.get("answer", "")})
-
+    return jsonify(
+        {
+            "answer": result.get("answer", ""),
+            "provider": result.get("provider", provider),
+            "provider_label": result.get("provider_label", "Groq Cloud"),
+            "sources": result.get("sources", []),
+        }
+    )
