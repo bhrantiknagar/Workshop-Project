@@ -26,5 +26,7 @@ def ask_question():
         # If retrieval failed, present a helpful message
         return jsonify({"answer": str(exc)}), 500
 
-    # result contains `answer` and `sources`
-    return jsonify(result)
+    # Hide sources in the API response for the frontend.
+    # Frontend can render the plain answer without citation/source lists.
+    return jsonify({"answer": result.get("answer", "")})
+

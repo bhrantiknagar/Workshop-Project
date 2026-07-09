@@ -15,7 +15,7 @@
     return `${hours}:${minutes} ${ampm}`;
   }
 
-  function loadHistory() {
+    function loadHistory() {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
@@ -23,6 +23,51 @@
       return [];
     }
   }
+
+  function buildHistorySidebar(history) {
+    const historyBox = document.getElementById('chatHistoryBox');
+    if (!historyBox) return;
+
+    // Only show user questions
+    const userMsgs = Array.isArray(history) ? history.filter((m) => m && m.role === 'user') : [];
+
+    historyBox.innerHTML = '';
+    if (!userMsgs.length) {
+      historyBox.innerHTML = `
+        <div class="history-empty">
+          <i class="fa-regular fa-message"></i>
+          <div class="history-empty-title">No questions yet</div>
+          <div class="history-empty-sub">Ask something about your PDF.</div>
+        </div>
+      `;
+      return;
+    }
+
+    // Render latest first
+    userMsgs
+      .slice()
+      .reverse()
+      .forEach((m, idx) => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'history-item';
+        item.title = m.text;
+        item.textContent = m.text.length > 42 ? m.text.slice(0, 42) + '…' : m.text;
+        item.addEventListener('click', () => {
+          // Scroll to the corresponding question message
+          const allMessageEls = document.querySelectorAll('#chatMessages .message');
+          const targetUserIndex = history.lastIndexOf(m);
+          // Best-effort: find the message with exact text
+          const match = Array.from(allMessageEls).find((el) => {
+            const p = el.querySelector('p');
+            return p && p.textContent === m.text;
+          });
+          match?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        historyBox.appendChild(item);
+      });
+  }
+
 
   function saveHistory(messages) {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
@@ -75,22 +120,7 @@
 
     contentWrap.appendChild(actions);
 
-    // sources (if any)
-    if (!isUser && Array.isArray(msg.sources) && msg.sources.length) {
-      const src = document.createElement('div');
-      src.className = 'source-list';
-      const title = document.createElement('strong');
-      title.textContent = 'Sources';
-      src.appendChild(title);
-      const ul = document.createElement('ul');
-      msg.sources.forEach((s) => {
-        const li = document.createElement('li');
-        li.textContent = `${s.filename || s.pdf_id}${s.page ? ' — page ' + s.page : ''}`;
-        ul.appendChild(li);
-      });
-      src.appendChild(ul);
-      contentWrap.appendChild(src);
-    }
+
 
     el.appendChild(contentWrap);
     return el;
@@ -120,18 +150,38 @@
           <button class="small-btn" id="chatClear">Clear Chat</button>
         </div>
       </div>
+
       <div class="pdf-chat-body">
         <div class="chat-window">
-          <div class="messages" id="chatMessages" aria-live="polite"></div>
-          <div class="chat-input">
-            <textarea id="chatInput" placeholder="Ask about the uploaded PDFs... (Shift+Enter = newline)"></textarea>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              <button id="chatSend">Ask</button>
+          <div class="chat-layout">
+            <div class="chat-main">
+              <div class="messages" id="chatMessages" aria-live="polite"></div>
+              <div class="chat-input">
+                <textarea id="chatInput" placeholder="Ask about the uploaded PDFs... (Shift+Enter = newline)"></textarea>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <button id="chatSend">Ask</button>
+                </div>
+              </div>
             </div>
+
+            <div class="chat-history-trigger-wrap">
+              <button class="small-btn" id="chatHistoryToggle" type="button">History</button>
+            </div>
+
+            <aside class="chat-history-sidebar" aria-label="Chat history" id="chatHistorySidebar" hidden>
+
+              <div class="chat-history-header">
+
+                <span>History</span>
+              </div>
+              <div class="chat-history-box" id="chatHistoryBox"></div>
+            </aside>
           </div>
         </div>
       </div>
     `;
+
+
 
     const messagesEl = document.getElementById('chatMessages');
     const inputEl = document.getElementById('chatInput');
@@ -140,12 +190,29 @@
 
     let messages = loadHistory();
     renderMessages(messagesEl, messages);
+    buildHistorySidebar(messages);
+
+    const historyToggleBtn = document.getElementById('chatHistoryToggle');
+    const historySidebar = document.getElementById('chatHistorySidebar');
+    historyToggleBtn?.addEventListener('click', () => {
+      const willShow = historySidebar && historySidebar.hasAttribute('hidden');
+      if (!historySidebar) return;
+      if (willShow) {
+        historySidebar.removeAttribute('hidden');
+      } else {
+        historySidebar.setAttribute('hidden', 'hidden');
+      }
+    });
+
+
 
     function appendAndSave(msg) {
       messages.push(msg);
       saveHistory(messages);
       renderMessages(messagesEl, messages);
+      buildHistorySidebar(messages);
     }
+
 
     async function sendQuestion() {
       const q = (inputEl.value || '').trim();
@@ -184,8 +251,9 @@
         // remove loading message
         messages.pop();
         if (resp.ok) {
-          const aiMsg = { role: 'assistant', text: data.answer || 'No answer returned.', ts: Date.now(), sources: data.sources || [] };
+          const aiMsg = { role: 'assistant', text: data.answer || 'No answer returned.', ts: Date.now() };
           appendAndSave(aiMsg);
+
         } else {
           const errMsg = { role: 'assistant', text: data.answer || data.error || 'Error from server.', ts: Date.now() };
           appendAndSave(errMsg);
@@ -228,7 +296,9 @@
       messages = [];
       saveHistory(messages);
       renderMessages(messagesEl, messages);
+      buildHistorySidebar(messages);
     });
+
   });
 })();
 // Creates a frontend-only AI chat preview with typing, copy, and history.

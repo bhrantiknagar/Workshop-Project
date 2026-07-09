@@ -142,3 +142,6 @@ services.embedding_service.EmbeddingError: Failed to persist embeddings for PDF 
 2026-07-05 14:56:35,049 WARNING: Failed to generate embeddings for 2nd_sem_Open_source_Technology.pdf: Failed to persist embeddings for PDF 2nd_sem_Open_source_Technology: 'D:\\Workshop_Project\\backend\\database\\chroma_db'
 2026-07-07 23:50:56,109 WARNING: Failed to generate embeddings for basic-text.pdf: Failed to persist embeddings for PDF basic-text: Could not connect to tenant default_tenant. Are you sure it exists?
 2026-07-07 23:50:56,110 WARNING: Failed to generate embeddings for basic-text.pdf: Failed to persist embeddings for PDF basic-text: 'RustBindingsAPI' object has no attribute 'bindings'
+2026-07-09 10:49:47,573 WARNING: Failed to generate embeddings for sample-50-page-pdf-a4-size.pdf: Failed to load embedding model 'all-MiniLM-L6-v2': Cannot send a request, as the client has been closed.
+2026-07-09 10:49:47,953 WARNING: Failed to generate embeddings for basic-text.pdf: Failed to load embedding model 'all-MiniLM-L6-v2': Cannot send a request, as the client has been closed.
+2026-07-09 10:51:58,573 WARNING: Failed to generate embeddings for sample-50-page-pdf-a4-size.pdf: Failed to load embedding model 'all-MiniLM-L6-v2': Cannot send a request, as the client has been closed.
