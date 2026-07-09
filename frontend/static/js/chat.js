@@ -73,6 +73,182 @@
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
   }
 
+  function appendInlineFormattedText(parent, text) {
+    const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g);
+    parts.forEach((part) => {
+      if (!part) return;
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const strong = document.createElement('strong');
+        strong.textContent = part.slice(2, -2).trim();
+        parent.appendChild(strong);
+        return;
+      }
+      parent.appendChild(document.createTextNode(part.replace(/\*\*/g, '')));
+    });
+  }
+
+  function normalizeAnswerText(text) {
+    return String(text || '')
+      .replace(/\r\n?/g, '\n')
+      .replace(/\s+(\d+)\.\s+/g, '\n$1. ')
+      .replace(/\s+[*-]\s+/g, '\n- ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function isTableLine(line) {
+    return /^\|.*\|$/.test(line.trim());
+  }
+
+  function isTableSeparator(line) {
+    return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(line.trim());
+  }
+
+  function parseTableRow(line) {
+    return line
+      .trim()
+      .replace(/^\|/, '')
+      .replace(/\|$/, '')
+      .split('|')
+      .map((cell) => cell.trim());
+  }
+
+  function appendMarkdownTable(parent, tableLines) {
+    const rows = tableLines.filter((line) => !isTableSeparator(line)).map(parseTableRow);
+    if (!rows.length) return;
+
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'answer-table-wrap';
+    const table = document.createElement('table');
+    const header = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+
+    rows[0].forEach((cell) => {
+      const th = document.createElement('th');
+      appendInlineFormattedText(th, cell);
+      headerRow.appendChild(th);
+    });
+    header.appendChild(headerRow);
+    table.appendChild(header);
+
+    const body = document.createElement('tbody');
+    rows.slice(1).forEach((row) => {
+      const tr = document.createElement('tr');
+      row.forEach((cell) => {
+        const td = document.createElement('td');
+        appendInlineFormattedText(td, cell);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    tableWrap.appendChild(table);
+    parent.appendChild(tableWrap);
+  }
+
+  function normalizeSources(sources) {
+    if (Array.isArray(sources)) {
+      return sources.reduce((grouped, source) => {
+        const filename = source.filename || 'unknown.pdf';
+        const page = source.page || '?';
+        grouped[filename] = grouped[filename] || new Set();
+        grouped[filename].add(page);
+        return grouped;
+      }, {});
+    }
+
+    if (sources && typeof sources === 'object') {
+      return Object.entries(sources).reduce((grouped, [filename, pages]) => {
+        grouped[filename] = new Set(Array.isArray(pages) && pages.length ? pages : ['?']);
+        return grouped;
+      }, {});
+    }
+
+    return {};
+  }
+
+  function appendPageReferences(parent, sources) {
+    const groupedSources = normalizeSources(sources);
+    const entries = Object.entries(groupedSources);
+    if (!entries.length) return;
+
+    const refs = document.createElement('div');
+    refs.className = 'page-references';
+    const title = document.createElement('strong');
+    title.textContent = 'Page references';
+    refs.appendChild(title);
+
+    entries.forEach(([filename, pages]) => {
+      const row = document.createElement('div');
+      row.className = 'page-reference-row';
+      const sortedPages = Array.from(pages).sort((a, b) => Number(a) - Number(b));
+      row.textContent = `${filename}: ${sortedPages.map((page) => `Page ${page}`).join(', ')}`;
+      refs.appendChild(row);
+    });
+
+    parent.appendChild(refs);
+  }
+
+  function appendFormattedAnswer(parent, text) {
+    const lines = normalizeAnswerText(text).split('\n').map((line) => line.trim()).filter(Boolean);
+    let activeList = null;
+    let activeListType = '';
+
+    function closeList() {
+      activeList = null;
+      activeListType = '';
+    }
+
+    function appendListItem(listType, content) {
+      if (!activeList || activeListType !== listType) {
+        activeList = document.createElement(listType);
+        activeListType = listType;
+        parent.appendChild(activeList);
+      }
+      const item = document.createElement('li');
+      appendInlineFormattedText(item, content);
+      activeList.appendChild(item);
+    }
+
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      if (isTableLine(line)) {
+        closeList();
+        const tableLines = [];
+        while (index < lines.length && isTableLine(lines[index])) {
+          tableLines.push(lines[index]);
+          index += 1;
+        }
+        index -= 1;
+        appendMarkdownTable(parent, tableLines);
+        continue;
+      }
+
+      const numbered = line.match(/^(\d+)\.\s+(.*)$/);
+      if (numbered) {
+        appendListItem('ol', numbered[2]);
+        continue;
+      }
+
+      const bullet = line.match(/^[-*]\s+(.*)$/);
+      if (bullet) {
+        appendListItem('ul', bullet[1]);
+        continue;
+      }
+
+      closeList();
+      const paragraph = document.createElement('p');
+      appendInlineFormattedText(paragraph, line);
+      parent.appendChild(paragraph);
+    }
+
+    if (!parent.childNodes.length) {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text || '';
+      parent.appendChild(paragraph);
+    }
+  }
+
   function createMessageNode(msg) {
     // Build a message node that matches the chat CSS structure
     const el = document.createElement('div');
@@ -89,32 +265,23 @@
     const contentWrap = document.createElement('div');
     contentWrap.className = 'message-content';
 
-    const p = document.createElement('p');
-    p.textContent = msg.text;
     if (!isUser && msg.providerLabel) {
       const modelMeta = document.createElement('div');
       modelMeta.className = 'model-meta';
       modelMeta.textContent = `Using: ${msg.providerLabel}`;
       contentWrap.appendChild(modelMeta);
     }
-    contentWrap.appendChild(p);
 
-    if (!isUser && Array.isArray(msg.sources) && msg.sources.length) {
-      const sourceList = document.createElement('div');
-      sourceList.className = 'source-list';
-      const title = document.createElement('strong');
-      title.textContent = 'Sources';
-      const list = document.createElement('ul');
-      msg.sources.forEach((source) => {
-        const item = document.createElement('li');
-        const filename = source.filename || 'unknown.pdf';
-        const page = source.page || '?';
-        item.textContent = `${filename} - page ${page}`;
-        list.appendChild(item);
-      });
-      sourceList.appendChild(title);
-      sourceList.appendChild(list);
-      contentWrap.appendChild(sourceList);
+    if (isUser) {
+      const p = document.createElement('p');
+      p.textContent = msg.text;
+      contentWrap.appendChild(p);
+    } else {
+      const answer = document.createElement('div');
+      answer.className = 'answer-content';
+      appendFormattedAnswer(answer, msg.text);
+      contentWrap.appendChild(answer);
+      appendPageReferences(contentWrap, msg.sources);
     }
 
     // actions (copy, page badge, time)
@@ -352,6 +519,23 @@
       saveHistory(messages);
       renderMessages(messagesEl, messages);
       buildHistorySidebar(messages);
+    });
+
+    document.addEventListener('pdfAiResponseMessage', function (event) {
+      const detail = event.detail || {};
+      appendAndSave({
+        role: 'user',
+        text: detail.userText || detail.prompt || 'Quick AI Action',
+        ts: Date.now(),
+      });
+      appendAndSave({
+        role: 'assistant',
+        text: detail.answer || 'No response returned.',
+        ts: Date.now(),
+        provider: detail.provider || 'groq',
+        providerLabel: detail.providerLabel || 'Groq Cloud',
+        sources: detail.sources || [],
+      });
     });
 
   });

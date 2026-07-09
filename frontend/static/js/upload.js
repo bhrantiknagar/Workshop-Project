@@ -28,6 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         uploadedFileList.innerHTML = "";
+        if (files.length) {
+            const heading = document.createElement("div");
+            heading.className = "prompt-file-list-heading";
+            heading.textContent = "Uploaded PDFs";
+            uploadedFileList.appendChild(heading);
+        }
+
         files.forEach((file) => {
             const row = document.createElement("article");
             row.className = "prompt-file-card";
@@ -46,6 +53,32 @@ document.addEventListener("DOMContentLoaded", () => {
             row.querySelector(".preview-button").dataset.previewId = file.id;
             uploadedFileList.appendChild(row);
         });
+
+        if (files.length === 2) {
+            const compareButton = document.createElement("button");
+            compareButton.className = "compare-pdfs-button";
+            compareButton.type = "button";
+            compareButton.dataset.comparePdfs = "true";
+            compareButton.textContent = "Compare PDFs";
+            uploadedFileList.appendChild(compareButton);
+        }
+
+        if (files.length) {
+            const actions = document.createElement("section");
+            actions.className = "quick-actions";
+            actions.setAttribute("aria-label", "Quick AI Actions");
+            actions.innerHTML = `
+                <div class="quick-actions-title">Quick AI Actions</div>
+                <div class="quick-actions-grid">
+                    <button type="button" data-quick-action="summarize">Summarize PDF</button>
+                    <button type="button" data-quick-action="study_notes">Generate Study Notes</button>
+                    <button type="button" data-quick-action="key_points">Extract Key Points</button>
+                    <button type="button" data-quick-action="quiz">Generate Quiz</button>
+                    <button type="button" data-quick-action="flashcards">Generate Flashcards</button>
+                </div>
+            `;
+            uploadedFileList.appendChild(actions);
+        }
 
         const clearButton = document.createElement("button");
         clearButton.className = "prompt-clear-button";
@@ -154,6 +187,109 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    async function compareUploadedPdfs(button) {
+        if (uploadedPdfs.length !== 2) {
+            window.showToast("Upload exactly two PDFs to compare.");
+            return;
+        }
+
+        const prompt = window.prompt(
+            "What would you like to compare?\n\nExamples:\n- Compare the introduction.\n- Compare programming concepts.\n- Compare advantages.\n- Compare security features."
+        );
+
+        if (!prompt || !prompt.trim()) {
+            window.showToast("Comparison cancelled.");
+            return;
+        }
+
+        const modelSelect = document.querySelector("#aiModelSelect");
+        const provider = modelSelect?.value || "groq";
+        const previousText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Comparing...";
+
+        try {
+            const response = await fetch("/chat/compare", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    prompt: prompt.trim(),
+                    provider,
+                    pdf_ids: uploadedPdfs.map((pdf) => pdf.id),
+                }),
+            });
+            const payload = await response.json();
+
+            if (!response.ok) {
+                throw new Error(payload.answer || payload.error || "Comparison failed.");
+            }
+
+            document.dispatchEvent(new CustomEvent("pdfAiResponseMessage", {
+                detail: {
+                    prompt: prompt.trim(),
+                    userText: `Compare PDFs: ${prompt.trim()}`,
+                    answer: payload.answer || "No comparison returned.",
+                    provider: payload.provider || provider,
+                    providerLabel: payload.provider_label || (provider === "ollama" ? "Ollama Local" : "Groq Cloud"),
+                    sources: payload.sources || {},
+                },
+            }));
+            window.showToast("PDF comparison added to chat.");
+        } catch (error) {
+            window.showToast(error.message);
+        } finally {
+            button.disabled = false;
+            button.textContent = previousText;
+        }
+    }
+
+    async function runQuickAction(button) {
+        if (!uploadedPdfs.length) {
+            window.showToast("Upload a PDF before using Quick AI Actions.");
+            return;
+        }
+
+        const action = button.dataset.quickAction;
+        const modelSelect = document.querySelector("#aiModelSelect");
+        const provider = modelSelect?.value || "groq";
+        const previousText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Working...";
+
+        try {
+            const response = await fetch("/chat/action", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    action,
+                    provider,
+                    pdf_ids: uploadedPdfs.map((pdf) => pdf.id),
+                }),
+            });
+            const payload = await response.json();
+
+            if (!response.ok) {
+                throw new Error(payload.answer || payload.error || "Quick action failed.");
+            }
+
+            document.dispatchEvent(new CustomEvent("pdfAiResponseMessage", {
+                detail: {
+                    userText: payload.action_label || previousText,
+                    answer: payload.answer || "No response returned.",
+                    provider: payload.provider || provider,
+                    providerLabel: payload.provider_label || (provider === "ollama" ? "Ollama Local" : "Groq Cloud"),
+                    sources: payload.sources || [],
+                },
+            }));
+            window.showToast(`${payload.action_label || previousText} added to chat.`);
+        } catch (error) {
+            window.showToast(error.message);
+        } finally {
+            button.disabled = false;
+            button.textContent = previousText;
+        }
+    }
+
     function closePreview() {
         if (!previewModal) {
             return;
@@ -219,6 +355,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const previewButton = event.target.closest("[data-preview-id]");
         if (previewButton) {
             openPreview(previewButton.dataset.previewId);
+            return;
+        }
+
+        const compareButton = event.target.closest("[data-compare-pdfs]");
+        if (compareButton) {
+            compareUploadedPdfs(compareButton);
+            return;
+        }
+
+        const quickActionButton = event.target.closest("[data-quick-action]");
+        if (quickActionButton) {
+            runQuickAction(quickActionButton);
             return;
         }
 

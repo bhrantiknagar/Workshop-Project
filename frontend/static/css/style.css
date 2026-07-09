@@ -1318,6 +1318,13 @@ body.light-theme {
     margin: 0;
 }
 
+.prompt-file-list-heading {
+    color: #111827;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+}
+
 .prompt-clear-button {
     background: transparent;
     border: 0;
@@ -1331,6 +1338,75 @@ body.light-theme {
 
 .prompt-clear-button:hover {
     color: #ef4444;
+}
+
+.compare-pdfs-button {
+    align-items: center;
+    background: #2563eb;
+    border: 0;
+    border-radius: 10px;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 16px;
+}
+
+.compare-pdfs-button:hover {
+    background: #1d4ed8;
+}
+
+.compare-pdfs-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.quick-actions {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    text-align: left;
+}
+
+.quick-actions-title {
+    color: #111827;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.quick-actions-grid {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quick-actions-grid button {
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    border-radius: 9px;
+    color: #1d4ed8;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    min-height: 38px;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.quick-actions-grid button:hover {
+    background: #eff6ff;
+}
+
+.quick-actions-grid button:disabled {
+    cursor: wait;
+    opacity: 0.68;
 }
 
 .prompt-file-card[hidden] {
