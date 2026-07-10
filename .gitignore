@@ -1,9 +1,11 @@
 __pycache__/
 *.py[cod]
+*.pyc
 .venv/
 venv/
 .env
 .env.example 
+logs/
 logs/*.log
 static/uploads/*
 !static/uploads/.gitkeep
