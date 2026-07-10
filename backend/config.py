@@ -26,6 +26,6 @@ class Config:
     GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
     GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
     GROQ_TIMEOUT = int(os.getenv("GROQ_TIMEOUT", "60"))
-    # GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-    # GOOGLE_EMBEDDING_MODEL = os.getenv("GOOGLE_EMBEDDING_MODEL", "models/gemini-embedding-001")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+    GOOGLE_EMBEDDING_MODEL = os.getenv("GOOGLE_EMBEDDING_MODEL", "models/gemini-embedding-001")
     ALLOWED_EXTENSIONS = {"pdf"}
