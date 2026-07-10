@@ -17,19 +17,10 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from services.vector_store import search_similar_chunks, VectorStoreError
 from services.llm_service import LLMServiceError
-from services import groq_service, ollama_service
+from services import groq_service
 
 
-PROVIDERS = {
-    "groq": {
-        "label": "Groq Cloud",
-        "generate": groq_service.generate_answer,
-    },
-    "ollama": {
-        "label": "Ollama Local",
-        "generate": ollama_service.generate_answer,
-    },
-}
+PROVIDERS = {"groq": {"label": "Groq Cloud", "generate": groq_service.generate_answer}}
 
 
 def _format_context(chunks: List[Dict]) -> str:
@@ -51,7 +42,7 @@ def _truncate_chunks_for_prompt(chunks: List[Dict], max_chars: int = 8000) -> Li
     """Return a prefix of `chunks` whose formatted context is within `max_chars`.
 
     This is a simple character-count based truncation to avoid sending
-    excessively large prompts to the Ollama service which can cause timeouts.
+    excessively large prompts to the cloud LLM service which can cause timeouts.
     We preserve chunk order (most relevant first) and include as many chunks
     as fit under the limit.
     """

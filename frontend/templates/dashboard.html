@@ -49,11 +49,11 @@
 
             <section class="llm-test-panel" aria-label="LLM test panel">
                 <h2>LLM Test</h2>
-                <p>Send a prompt to your local Ollama model to verify the connection.</p>
+                <p>Send a prompt to Groq to verify the cloud connection.</p>
                 {% if config.DEBUG %}
-                    <p class="dev-model">Configured model: <strong>{{ config['MODEL_NAME'] }}</strong></p>
+                    <p class="dev-model">Configured model: <strong>{{ config['GROQ_MODEL'] }}</strong></p>
                 {% endif %}
-                <textarea id="llmPrompt" rows="4" placeholder="Type a prompt to test the local LLM connection..."></textarea>
+                <textarea id="llmPrompt" rows="4" placeholder="Type a prompt to test the Groq connection..."></textarea>
                 <div class="llm-test-actions">
                     <button id="llmGenerateButton" type="button">Generate</button>
                     <span id="llmStatus" class="llm-status">Idle</span>

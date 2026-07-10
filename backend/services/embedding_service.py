@@ -1,177 +1,123 @@
-"""Embedding service using SentenceTransformers.
+"""Cloud embedding service backed by Google's Gemini embedding API."""
 
-This module generates embeddings for text chunks and stores them
-in-memory as structured records. It intentionally does not persist
-to any database — that will be implemented in a later phase.
-"""
+import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List, Optional
 
+from flask import current_app, has_app_context
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+from config import Config
 from services.vector_store import add_embeddings
 
-_MODEL_NAME = "all-MiniLM-L6-v2"
 EMBEDDINGS_STORE: Dict[str, List[Dict[str, Any]]] = {}
-_MODEL = None
 
 
 class EmbeddingError(Exception):
     """Raised when an embedding operation fails."""
 
 
-def _load_model():
-    """Lazily load the sentence-transformers model.
+def _get_config_value(name: str, default: str) -> str:
+    if has_app_context():
+        return current_app.config.get(name, default)
+    return getattr(Config, name, default)
 
-    Raises EmbeddingError on failure.
-    """
-    global _MODEL
 
-    if _MODEL is not None:
-        return _MODEL
+def _get_embeddings_client() -> GoogleGenerativeAIEmbeddings:
+    """Create a hosted embeddings client without loading a local model."""
+    api_key = _get_config_value("GOOGLE_API_KEY", Config.GOOGLE_API_KEY) or os.getenv("GOOGLE_API_KEY", "")
+    api_key = api_key.strip() if isinstance(api_key, str) else ""
+    if not api_key:
+        raise EmbeddingError("Google API key is missing. Add GOOGLE_API_KEY to your environment.")
 
+    model = _get_config_value("GOOGLE_EMBEDDING_MODEL", Config.GOOGLE_EMBEDDING_MODEL)
     try:
-        from sentence_transformers import SentenceTransformer  # type: ignore
-    except ModuleNotFoundError as exc:  # pragma: no cover - environment dependent
-        raise EmbeddingError("sentence-transformers is not installed.") from exc
-
-    try:
-        _MODEL = SentenceTransformer(_MODEL_NAME)
-    except Exception as exc:  # pragma: no cover - model download/runtime issues
-        raise EmbeddingError(f"Failed to load embedding model '{_MODEL_NAME}': {exc}") from exc
-
-    return _MODEL
-
-
-def _to_list(vector) -> List[float]:
-    """Convert numpy array or tensor to plain Python list of floats."""
-    try:
-        return vector.tolist()
-    except Exception:
-        return [float(v) for v in vector]
+        return GoogleGenerativeAIEmbeddings(model=model, google_api_key=api_key)
+    except Exception as exc:
+        raise EmbeddingError(f"Failed to configure cloud embeddings: {exc}") from exc
 
 
 def embed_text(text: str) -> List[float]:
-    """Generate an embedding for a single piece of text.
-
-    Uses the same SentenceTransformer model as the PDF embedding flow.
-
-    Raises:
-        EmbeddingError: if the input is invalid or embedding generation fails.
-    """
+    """Generate a cloud embedding for one non-empty string."""
     if not isinstance(text, str) or not text.strip():
         raise EmbeddingError("Text to embed must be a non-empty string.")
 
-    model = _load_model()
     try:
-        vector = model.encode(text)
-        return _to_list(vector)
-    except Exception as exc:  # pragma: no cover - runtime encoding errors
+        return [float(value) for value in _get_embeddings_client().embed_query(text)]
+    except EmbeddingError:
+        raise
+    except Exception as exc:  # pragma: no cover - provider/network errors
         raise EmbeddingError(f"Failed to generate embedding for text: {exc}") from exc
 
 
-def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str, Any]]):
-    """Generate embeddings for each text chunk (page) in a PDF.
-
-    Args:
-        pdf_id: unique identifier for the PDF (e.g. 'pdf_001').
-        filename: original filename for display.
-        pages: list of page dicts with keys `page` (int) and `text` (str).
-
-    Returns:
-        summary dict with filename, pdf_id, chunks_created, embedding_dim, status
-
-    Raises:
-        EmbeddingError for model/load failures or invalid input.
-    """
+def generate_embeddings_for_pdf(pdf_id: str, filename: str, pages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Embed PDF page chunks with the hosted provider and persist them in ChromaDB."""
     if not isinstance(pages, list):
         raise EmbeddingError("Invalid pages input; expected a list of page dicts.")
 
-    model = _load_model()
-
-    chunks = []
+    chunks: List[Dict[str, Any]] = []
     for idx, page in enumerate(pages, start=1):
         text = (page.get("text") or "").strip()
         if not text:
-            # skip empty page chunks
             continue
-
-        chunk_id = f"{pdf_id}_chunk_{idx:03d}"
-        try:
-            vector = model.encode(text)
-            embedding = _to_list(vector)
-        except Exception as exc:  # pragma: no cover - runtime encoding errors
-            raise EmbeddingError(f"Failed to generate embedding for chunk {chunk_id}: {exc}") from exc
-
         chunks.append(
             {
-                "chunk_id": chunk_id,
+                "chunk_id": f"{pdf_id}_chunk_{idx:03d}",
                 "pdf_id": pdf_id,
                 "filename": filename,
                 "page": page.get("page", idx),
                 "text": text,
-                "embedding": embedding,
             }
         )
 
-    EMBEDDINGS_STORE[pdf_id] = chunks
-
     if chunks:
         try:
+            embeddings = _get_embeddings_client().embed_documents([chunk["text"] for chunk in chunks])
+            if len(embeddings) != len(chunks):
+                raise EmbeddingError("Cloud embedding provider returned an unexpected number of vectors.")
+            for chunk, embedding in zip(chunks, embeddings):
+                chunk["embedding"] = [float(value) for value in embedding]
             result = add_embeddings(chunks)
-        except Exception as exc:
-            raise EmbeddingError(f"Failed to persist embeddings for PDF {pdf_id}: {exc}") from exc
-        stored = result.get("stored", 0)
-        deleted = result.get("deleted", 0)
+        except EmbeddingError:
+            raise
+        except Exception as exc:  # pragma: no cover - provider/database errors
+            raise EmbeddingError(f"Failed to generate or persist embeddings for {filename}: {exc}") from exc
+        stored, deleted = result.get("stored", 0), result.get("deleted", 0)
     else:
-        stored = 0
-        deleted = 0
+        stored = deleted = 0
 
-    embedding_dim = len(chunks[0]["embedding"]) if chunks else 0
-
+    EMBEDDINGS_STORE[pdf_id] = chunks
     return {
         "filename": filename,
         "pdf_id": pdf_id,
         "chunks_created": len(chunks),
         "stored_embeddings": stored,
         "deleted_embeddings": deleted,
-        "embedding_dim": embedding_dim,
+        "embedding_dim": len(chunks[0]["embedding"]) if chunks else 0,
         "status": "Generated" if chunks else "No chunks to embed",
     }
 
 
-def generate_embeddings_for_all_pdfs(upload_folder: str):
-    """Scan the upload folder, extract text, and generate embeddings for each PDF.
-
-    Returns a list of summary dicts for each PDF processed.
-    """
+def generate_embeddings_for_all_pdfs(upload_folder: str) -> List[Dict[str, Any]]:
+    """Extract and embed every PDF in the upload folder."""
     from services.pdf_service import extract_text
 
-    upload_path = Path(upload_folder)
     summaries = []
-
-    for pdf_path in sorted(upload_path.glob("*.pdf")):
-        pdf_id = pdf_path.stem
-        filename = pdf_path.name
+    for pdf_path in sorted(Path(upload_folder).glob("*.pdf")):
         try:
-            pages = extract_text(pdf_path)
-            summary = generate_embeddings_for_pdf(pdf_id, filename, pages)
+            summaries.append(generate_embeddings_for_pdf(pdf_path.stem, pdf_path.name, extract_text(pdf_path)))
         except EmbeddingError:
             raise
-        except Exception as exc:  # pragma: no cover - file read/runtime issues
-            raise EmbeddingError(f"Failed processing {filename}: {exc}") from exc
-
-        summaries.append(summary)
-
+        except Exception as exc:  # pragma: no cover - file read/runtime errors
+            raise EmbeddingError(f"Failed processing {pdf_path.name}: {exc}") from exc
     return summaries
 
 
-def list_embeddings(pdf_id: str = None):
-    """Return stored embeddings. If `pdf_id` is provided, return only that PDF's chunks."""
-    if pdf_id:
-        return EMBEDDINGS_STORE.get(pdf_id, [])
-    return EMBEDDINGS_STORE
+def list_embeddings(pdf_id: Optional[str] = None):
+    """Return embeddings generated during the current process."""
+    return EMBEDDINGS_STORE.get(pdf_id, []) if pdf_id else EMBEDDINGS_STORE
 
 
-def clear_store():
-    """Clear in-memory embeddings (useful for tests)."""
+def clear_store() -> None:
+    """Clear in-memory embedding metadata (useful for tests)."""
     EMBEDDINGS_STORE.clear()
-

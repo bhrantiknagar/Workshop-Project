@@ -384,7 +384,6 @@
                 <span>AI Model</span>
                 <select id="aiModelSelect">
                   <option value="groq" selected>Groq Cloud</option>
-                  <option value="ollama">Ollama Local</option>
                 </select>
               </label>
               <div class="chat-input">
@@ -562,7 +561,7 @@
             text: data.answer || 'No answer returned.',
             ts: Date.now(),
             provider: data.provider || provider,
-            providerLabel: data.provider_label || (provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud'),
+            providerLabel: data.provider_label || 'Groq Cloud',
             sources: data.sources || [],
           };
           appendAndSave(aiMsg);
@@ -573,7 +572,7 @@
             text: data.answer || data.error || 'Error from server.',
             ts: Date.now(),
             provider,
-            providerLabel: provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud',
+            providerLabel: 'Groq Cloud',
           };
           appendAndSave(errMsg);
         }
@@ -585,7 +584,7 @@
           text: 'Network error while contacting the server.',
           ts: Date.now(),
           provider,
-          providerLabel: provider === 'ollama' ? 'Ollama Local' : 'Groq Cloud',
+          providerLabel: 'Groq Cloud',
         });
       }
     }

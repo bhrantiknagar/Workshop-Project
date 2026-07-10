@@ -13,8 +13,6 @@ data/temp/*
 !data/temp/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-data/embeddings/*
-!data/embeddings/.gitkeep
 database/chroma_db/*
 !database/chroma_db/.gitkeep
 .pytest_cache/

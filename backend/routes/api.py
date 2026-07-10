@@ -15,7 +15,7 @@ def health():
 
 @api_bp.post("/test-llm")
 def test_llm():
-    """Send a temporary prompt to the local Ollama backend."""
+    """Send a temporary prompt to the configured Groq model."""
     payload = request.get_json(silent=True) or {}
     # parsed payload is available as `payload`
     prompt = (payload.get("prompt") or "").strip()

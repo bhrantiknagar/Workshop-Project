@@ -115,12 +115,26 @@ def add_embeddings(chunks: List[Dict[str, Any]]) -> Dict[str, int]:
         for chunk in chunks
     ]
 
-    collection.add(
-        ids=ids,
-        documents=documents,
-        metadatas=metadatas,
-        embeddings=embeddings,
-    )
+    try:
+        collection.add(
+            ids=ids,
+            documents=documents,
+            metadatas=metadatas,
+            embeddings=embeddings,
+        )
+    except Exception as exc:
+        # Existing databases may contain vectors from the retired local model.
+        # Chroma collections require one vector dimension, so recreate only when
+        # that legacy collection conflicts with the hosted embedding dimension.
+        if "dimension" not in str(exc).lower():
+            raise VectorStoreError(f"Failed to add embeddings: {exc}") from exc
+        try:
+            client.delete_collection(collection.name)
+            collection = create_collection()
+            collection.add(ids=ids, documents=documents, metadatas=metadatas, embeddings=embeddings)
+            deleted = 0
+        except Exception as reset_exc:
+            raise VectorStoreError(f"Failed to recreate incompatible embedding collection: {reset_exc}") from reset_exc
     # Some chromadb client versions expose a `persist()` method on the
     # client; others persist automatically or expose different APIs.
     # Call persist if available, but don't raise if it's not present.

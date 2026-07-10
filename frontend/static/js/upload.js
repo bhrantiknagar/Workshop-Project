@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     userText: `Compare PDFs: ${prompt.trim()}`,
                     answer: payload.answer || "No comparison returned.",
                     provider: payload.provider || provider,
-                    providerLabel: payload.provider_label || (provider === "ollama" ? "Ollama Local" : "Groq Cloud"),
+                    providerLabel: payload.provider_label || "Groq Cloud",
                     sources: payload.sources || {},
                 },
             }));
@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     userText: payload.action_label || previousText,
                     answer: payload.answer || "No response returned.",
                     provider: payload.provider || provider,
-                    providerLabel: payload.provider_label || (provider === "ollama" ? "Ollama Local" : "Groq Cloud"),
+                    providerLabel: payload.provider_label || "Groq Cloud",
                     sources: payload.sources || [],
                 },
             }));
